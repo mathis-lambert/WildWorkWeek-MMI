@@ -1,19 +1,21 @@
 services:
   front_app:
-    build: ./front
+    build: ./front_app
     ports:
       - "3000:3000"
-    volumes:
-      - ./front:/app
     depends_on:
       - server_app
+    restart: always
+
 
   server_app:
     build: ./server_app
     ports:
       - "3001:3001"
-    volumes:
-        - ./server_app:/app
+    depends_on:
+        - mongo
+    restart: always
+
 
   mongo:
     image: mongo:latest
