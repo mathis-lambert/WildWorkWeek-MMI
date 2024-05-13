@@ -1,0 +1,23 @@
+services:
+  front_app:
+    build: ./front
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/app
+    depends_on:
+      - server_app
+
+  server_app:
+    build: ./server_app
+    ports:
+      - "3001:3001"
+    volumes:
+        - ./server_app:/app
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+        - ./mongodb/data:/data/db
