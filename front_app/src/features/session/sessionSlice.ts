@@ -5,33 +5,42 @@ export const sessionSlice = createSlice({
     name: 'session',
     initialState: {
         user_uuid: "",
+        user_email: "",
         user_firstname: "",
         user_lastname: "",
-        user_email: "",
-        // user_picture: "./user-icons/user-base-icon.svg",
+        user_role: "",
+        user_score: {development: 0, creativity: 0, marketing: 0},
+        user_status: "",
+        user_created_at: "",
+        user_updated_at: "",
         user_session_token: "",
-        // user_socket_id: "",
         isSignedIn: false,
     },
     reducers: {
         signIn: (state, action) => {
             state.user_uuid = action.payload.user_info.user_uuid;
+            state.user_email = action.payload.user_info.user_email;
             state.user_firstname = action.payload.user_info.user_firstname;
             state.user_lastname = action.payload.user_info.user_lastname;
-            state.user_email = action.payload.user_info.user_email;
-            // state.user_picture = action.payload.user_info.user_picture;
-            state.user_session_token = action.payload.user_info.user_session_token;
-            // state.user_socket_id = action.payload.user_info.user_socket_id;
+            state.user_role = action.payload.user_info.user_role;
+            state.user_score = action.payload.user_info.user_score;
+            state.user_status = action.payload.user_info.user_status;
+            state.user_created_at = action.payload.user_info.user_created_at;
+            state.user_updated_at = action.payload.user_info.user_updated_at;
+            state.user_session_token = action.payload.token;
             state.isSignedIn = true;
         },
         signOut: (state) => {
-            state.user_uuid = "";
+           state.user_uuid = "";
+            state.user_email = "";
             state.user_firstname = "";
             state.user_lastname = "";
-            state.user_email = "";
-            // state.user_picture = "./user-icons/user-base-icon.svg";
+            state.user_role = "";
+            state.user_score = {development: 0, creativity: 0, marketing: 0};
+            state.user_status = "";
+            state.user_created_at = "";
+            state.user_updated_at = "";
             state.user_session_token = "";
-            // state.user_socket_id = "";
             state.isSignedIn = false;
         },
     },

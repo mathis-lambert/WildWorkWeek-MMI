@@ -22,9 +22,6 @@ const Auth = () => {
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Register")
-        console.log(email)
-        console.log(password)
 
         const response = await fetch(`${URL}/auth/register`, {
             method: "POST",
@@ -40,10 +37,10 @@ const Auth = () => {
         });
 
         const data = await response.json();
-        console.log(data)
         if (data.success && data.data.user) {
             dispatch(signIn({
-                user_info: data.data.user
+                user_info: data.data.user,
+                token: data.data.token
             }))
         } else {
             setError("Enregistrement impossible : " + data.message)
@@ -52,9 +49,6 @@ const Auth = () => {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Login")
-        console.log(email)
-        console.log(password)
 
         const response = await fetch(`${URL}/auth/login`, {
             method: "POST",
@@ -68,10 +62,10 @@ const Auth = () => {
         });
 
         const data = await response.json();
-        console.log(data)
         if (data.success && data.data.user) {
             dispatch(signIn({
-                user_info: data.data.user
+                user_info: data.data.user,
+                token: data.data.token
             }))
         } else {
             setError("Connexion impossible : " + data.message)

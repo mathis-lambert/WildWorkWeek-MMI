@@ -43,7 +43,7 @@ router.post("/auth/login", async function (req, res) {
                         user_session_token: jwt.sign({user: user.user_email + user.user_password}, process.env.JWT_SECRET, {expiresIn: "2h"})
                     });
 
-                    return res.json({message: "User found", success: true, data: {user: user.info}});
+                    return res.json({message: "User found", success: true, data: {user: user.info, token: user.user_session_token}});
                 } else {
                     return res.status(400).json({message: "Challenge not succeed", success: false});
                 }
@@ -80,7 +80,7 @@ router.post("/auth/register", async function (req, res) {
 
                 await newUser.save();
 
-                return res.json({message: "User created", success: true, data: {user: newUser.info}});
+                return res.json({message: "User created", success: true, data: {user: newUser.info, token: user.user_session_token}});
             }
         } else {
             return res.status(400).json({message: "Invalid email", success: false});
