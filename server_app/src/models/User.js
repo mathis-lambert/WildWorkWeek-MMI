@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Companion = require('./Companion');
 
 const UserSchema = new Schema({
     user_uuid: {
@@ -28,6 +29,10 @@ const UserSchema = new Schema({
         creativity: {type: Number, default: 0},
         marketing: {type: Number, default: 0},
     },
+    user_weapon: {type: Schema.Types.ObjectId, ref: "Weapon"},
+    user_companion: {type: Schema.Types.ObjectId, ref: "Companion"},
+
+
     user_role: {
         type: String,
         enum: ["admin", "user"],

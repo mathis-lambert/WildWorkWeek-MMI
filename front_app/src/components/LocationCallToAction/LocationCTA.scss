@@ -1,0 +1,9 @@
+.location-cta {
+  position: absolute;
+    cursor: pointer;
+    pointer-events: all;
+
+  &.debug {
+    border: 1px solid red;
+  }
+}

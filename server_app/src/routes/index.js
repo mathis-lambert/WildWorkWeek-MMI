@@ -68,6 +68,7 @@ router.post("/auth/register", async function (req, res) {
             if (user) {
                 return res.status(400).json({message: "User already exists", success: false});
             } else {
+                const token = jwt.sign({user: email + password}, process.env.JWT_SECRET, {expiresIn: "2h"});
                 const newUser = new User({
                     user_uuid: uuidv4(),
                     user_email: email,
@@ -75,12 +76,11 @@ router.post("/auth/register", async function (req, res) {
                     user_lastname: last_name,
                     user_password: password,
                     user_status: "offline",
-                    user_session_token: jwt.sign({user: email + password}, process.env.JWT_SECRET, {expiresIn: "2h"})
+                    user_session_token: token
                 });
-
                 await newUser.save();
 
-                return res.json({message: "User created", success: true, data: {user: newUser.info, token: user.user_session_token}});
+                return res.json({message: "User created", success: true, data: {user: newUser.info, token: token}});
             }
         } else {
             return res.status(400).json({message: "Invalid email", success: false});

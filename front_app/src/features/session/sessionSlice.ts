@@ -43,9 +43,24 @@ export const sessionSlice = createSlice({
             state.user_session_token = "";
             state.isSignedIn = false;
         },
+        updateScore: (state, action) => {
+            switch (action.payload.skill) {
+                case "development":
+                    state.user_score.development += action.payload.score;
+                    break;
+                case "creativity":
+                    state.user_score.creativity += action.payload.score;
+                    break;
+                case "marketing":
+                    state.user_score.marketing += action.payload.score;
+                    break;
+                default:
+                    break;
+            }
+        }
     },
 });
 
-export const {signIn, signOut} = sessionSlice.actions;
+export const {signIn, signOut, updateScore} = sessionSlice.actions;
 
 export default sessionSlice.reducer;

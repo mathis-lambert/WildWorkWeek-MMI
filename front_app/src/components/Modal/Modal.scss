@@ -1,0 +1,24 @@
+.modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  padding: 5rem;
+  z-index: 1000;
+
+  opacity: 0;
+  transition: opacity 300ms;
+
+  .modal-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  &.open {
+    pointer-events: all;
+    opacity: 1;
+  }
+}

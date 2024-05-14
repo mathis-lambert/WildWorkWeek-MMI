@@ -1,0 +1,92 @@
+.profil-card {
+  flex: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+
+
+  &__avatar {
+    width: 250px;
+    height: 250px;
+
+    background-image: var(--gradient-radial-secondary);
+    border: 5px solid #000;
+    border-image: var(--gradient-radial-primary) 1;
+  }
+
+  &__infos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    gap: 1rem;
+
+    h2 {
+      font-size: 2em;
+      font-family: 'MedievalSharp', cursive;
+      text-align: center;
+      max-width: 80%;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
+  &__inventory {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    padding: 1rem;
+    justify-content: center;
+    overflow: hidden;
+
+
+    .item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      width: 110px;
+
+      .icon {
+        width: 50px;
+        height: 50px;
+        aspect-ratio: 1;
+        background-image: var(--gradient-radial-secondary);
+        border-radius: 50%;
+        object-fit: contain;
+        user-select: none;
+        pointer-events: none;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      }
+
+      span {
+        max-width: 100%;
+        font-size: 0.75rem;
+        font-family: 'MedievalSharp', cursive;
+        text-align: center;
+        overflow: hidden;
+      }
+    }
+  }
+
+  &__button {
+    border-radius: 8px;
+    font-family: 'MedievalSharp', cursive;
+    background-image: var(--gradient-radial-secondary);
+    padding: 0.5rem 1.25rem;
+    font-size: 1.2rem;
+    color: #fff;
+    transition:color 300ms, filter 300ms;
+
+    &:hover {
+      color: #fff;
+        filter: drop-shadow(0 0 10px #fff);
+      animation: levitating 1s infinite alternate;
+    }
+
+  }
+}
