@@ -24,6 +24,7 @@ router.get("/", async function (req, res) {
 
 router.post("/auth/login", async function (req, res) {
     console.log("une requete sur /auth/login");
+    console.log(req.body)
 
     const {email, challenge} = req.body;
     try {
@@ -43,9 +44,10 @@ router.post("/auth/login", async function (req, res) {
                     });
 
                     return res.json({message: "User found", success: true, data: {user: user.info}});
+                } else {
+                    return res.status(400).json({message: "Challenge not succeed", success: false});
                 }
             }
-            return res.json({message: "User found", success: true});
         } else {
             return res.status(400).json({message: "Invalid email", success: false});
         }
@@ -57,6 +59,7 @@ router.post("/auth/login", async function (req, res) {
 
 router.post("/auth/register", async function (req, res) {
     console.log("une requete sur /auth/register");
+    console.log(req.body)
 
     const {email, first_name, last_name, password} = req.body;
     try {

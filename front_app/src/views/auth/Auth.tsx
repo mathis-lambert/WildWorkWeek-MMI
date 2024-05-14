@@ -1,9 +1,14 @@
 import React, {useState} from "react";
 import Form from "../../components/Form/Form.tsx";
 import {URL} from "../../app/socket.ts";
-import sha256 from "../../utils/sha256"
+import sha256 from "../../utils/sha256";
+import {useDispatch} from "react-redux";
+import {signIn} from "../../features/session/sessionSlice.ts";
+
 
 const Auth = () => {
+    const dispatch = useDispatch()
+
     const [register, setRegister] = useState(false);
     const [login, setLogin] = useState(true);
 
@@ -12,10 +17,14 @@ const Auth = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const [error, setError] = useState("")
+
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Register")
+        console.log(email)
+        console.log(password)
 
         const response = await fetch(`${URL}/auth/register`, {
             method: "POST",
@@ -26,17 +35,26 @@ const Auth = () => {
                 first_name: firstName,
                 last_name: lastName,
                 email: email,
-                password: password,
+                password: await sha256(password),
             }),
         });
 
         const data = await response.json();
-        console.log(data);
+        console.log(data)
+        if (data.success && data.data.user) {
+            dispatch(signIn({
+                user_info: data.data.user
+            }))
+        } else {
+            setError("Enregistrement impossible : " + data.message)
+        }
     }
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Login")
+        console.log(email)
+        console.log(password)
 
         const response = await fetch(`${URL}/auth/login`, {
             method: "POST",
@@ -45,13 +63,19 @@ const Auth = () => {
             },
             body: JSON.stringify({
                 email: email,
-                challenge: await sha256(email + password)
+                challenge: await sha256(email + await sha256(password))
             }),
         });
 
         const data = await response.json();
-        console.log(data);
-
+        console.log(data)
+        if (data.success && data.data.user) {
+            dispatch(signIn({
+                user_info: data.data.user
+            }))
+        } else {
+            setError("Connexion impossible : " + data.message)
+        }
     }
 
 
@@ -89,7 +113,7 @@ const Auth = () => {
                                 type: "password",
                                 placeholder: "Password",
                                 value: password,
-                                onChange: async (e) => setPassword(await sha256(e.target.value))
+                                onChange: (e) => setPassword(e.target.value)
                             },
 
                         ]}
@@ -122,7 +146,7 @@ const Auth = () => {
                                 type: "password",
                                 placeholder: "Password",
                                 value: password,
-                                onChange: async (e) => setPassword(await sha256(e.target.value))
+                                onChange: (e) => setPassword(e.target.value)
                             },
 
                         ]}
@@ -136,6 +160,7 @@ const Auth = () => {
                     }}>S'enregistrer</button></p>
                 </div>
             )}
+            <p>{error}</p>
         </div>
     );
 }
