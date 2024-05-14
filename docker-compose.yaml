@@ -6,6 +6,8 @@ services:
     depends_on:
       - server_app
     restart: always
+    networks:
+      - www_mmi
 
 
   server_app:
@@ -15,11 +17,23 @@ services:
     depends_on:
         - mongo
     restart: always
+    networks:
+      - www_mmi
 
 
   mongo:
     image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: www_mmi
     ports:
       - "27017:27017"
     volumes:
         - ./mongodb/data:/data/db
+    networks:
+      - www_mmi
+
+networks:
+  www_mmi:
