@@ -10,6 +10,8 @@ interface SessionState {
             creativity: number,
             marketing: number
         },
+        user_weapon: "gant" | "lunettes" | "bague" | "aucun",
+        user_companion: "maugy" | "ploucou" | "jada" | "aucun",
         user_status: string,
         user_created_at: string,
         user_updated_at: string,

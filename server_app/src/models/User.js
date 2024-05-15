@@ -29,8 +29,15 @@ const UserSchema = new Schema({
         creativity: {type: Number, default: 0},
         marketing: {type: Number, default: 0},
     },
-    user_weapon: {type: Schema.Types.ObjectId, ref: "Weapon"},
-    user_companion: {type: Schema.Types.ObjectId, ref: "Companion"},
+    // user_weapon: {type: Schema.Types.ObjectId, ref: "Weapon"},
+    user_weapon: {type: String, enum: ["gant", "lunettes", "bague", "aucun"], default: "aucun", required: true},
+    // user_companion: {type: Schema.Types.ObjectId, ref: "Companion"},
+    user_companion: {
+        type: String,
+        enum: ["chien", "jada", "maugy", "ploucou", "aucun"],
+        default: "aucun",
+        required: true
+    },
 
 
     user_role: {
@@ -65,6 +72,8 @@ UserSchema.virtual("info").get(function () {
         user_lastname: this.user_lastname,
         user_email: this.user_email,
         user_score: this.user_score,
+        user_weapon: this.user_weapon,
+        user_companion: this.user_companion,
         user_role: this.user_role,
         user_status: this.user_status,
         user_created_at: this.user_created_at,

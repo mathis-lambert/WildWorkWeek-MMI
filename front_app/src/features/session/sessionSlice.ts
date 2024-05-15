@@ -10,6 +10,8 @@ export const sessionSlice = createSlice({
         user_lastname: "",
         user_role: "",
         user_score: {development: 0, creativity: 0, marketing: 0},
+        user_weapon: "",
+        user_companion: "",
         user_status: "",
         user_created_at: "",
         user_updated_at: "",
@@ -24,6 +26,8 @@ export const sessionSlice = createSlice({
             state.user_lastname = action.payload.user_info.user_lastname;
             state.user_role = action.payload.user_info.user_role;
             state.user_score = action.payload.user_info.user_score;
+            state.user_weapon = action.payload.user_info.user_weapon;
+            state.user_companion = action.payload.user_info.user_companion;
             state.user_status = action.payload.user_info.user_status;
             state.user_created_at = action.payload.user_info.user_created_at;
             state.user_updated_at = action.payload.user_info.user_updated_at;
@@ -37,6 +41,8 @@ export const sessionSlice = createSlice({
             state.user_lastname = "";
             state.user_role = "";
             state.user_score = {development: 0, creativity: 0, marketing: 0};
+            state.user_weapon = "";
+            state.user_companion = "";
             state.user_status = "";
             state.user_created_at = "";
             state.user_updated_at = "";
@@ -57,10 +63,16 @@ export const sessionSlice = createSlice({
                 default:
                     break;
             }
-        }
+        },
+        chooseWeapon: (state, action) => {
+            state.user_weapon = action.payload.weapon;
+        },
+        chooseCompanion: (state, action) => {
+            state.user_companion = action.payload.companion;
+        },
     },
 });
 
-export const {signIn, signOut, updateScore} = sessionSlice.actions;
+export const {signIn, signOut, updateScore, chooseWeapon, chooseCompanion} = sessionSlice.actions;
 
 export default sessionSlice.reducer;
