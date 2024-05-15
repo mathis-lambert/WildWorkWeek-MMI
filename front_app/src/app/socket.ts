@@ -10,7 +10,7 @@ console.log(import.meta.env.VITE_API_URL);
 console.log("URL", URL);
 
 const socket = io(URL, {
-    path: "/socket.io",
+    path: "api/socket.io",
     transports: ["websocket"],
     autoConnect: true,
     reconnection: true,
