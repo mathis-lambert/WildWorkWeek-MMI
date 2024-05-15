@@ -242,6 +242,7 @@ const GameManager = () => {
                                             }
                                         }}>Choisir
                                         </button>
+
                                     </div>
 
                                     <div className="card">
