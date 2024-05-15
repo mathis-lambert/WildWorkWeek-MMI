@@ -6,11 +6,8 @@ const currentProtocol = window.location.protocol;
 
 const URL = import.meta.env.VITE_API_URL || `${currentProtocol}//${currentURL}`;
 
-console.log(import.meta.env.VITE_API_URL);
-console.log("URL", URL);
-
 const socket = io(URL, {
-    path: "api/socket.io",
+    path: "/api/socket.io",
     transports: ["websocket"],
     autoConnect: true,
     reconnection: true,
