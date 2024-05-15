@@ -64,6 +64,21 @@ export const sessionSlice = createSlice({
                     break;
             }
         },
+        setScore: (state, action) => {
+            switch (action.payload.skill) {
+                case "development":
+                    state.user_score.development = action.payload.score;
+                    break;
+                case "creativity":
+                    state.user_score.creativity = action.payload.score;
+                    break;
+                case "marketing":
+                    state.user_score.marketing = action.payload.score;
+                    break;
+                default:
+                    break;
+            }
+        },
         chooseWeapon: (state, action) => {
             state.user_weapon = action.payload.weapon;
         },
@@ -73,6 +88,6 @@ export const sessionSlice = createSlice({
     },
 });
 
-export const {signIn, signOut, updateScore, chooseWeapon, chooseCompanion} = sessionSlice.actions;
+export const {signIn, signOut, updateScore, setScore, chooseWeapon, chooseCompanion} = sessionSlice.actions;
 
 export default sessionSlice.reducer;

@@ -136,6 +136,43 @@ router.post("/user/score/add", async function (req, res) {
     }
 });
 
+router.post("/user/score/set", async function (req, res) {
+    console.log("une requete sur /user/score/add");
+    console.log(req.body)
+    console.log(req.headers.authorization)
+
+    const {skill, score} = req.body;
+    try {
+        const user = await User.findOne({user_session_token: req.headers.authorization.split(" ")[1]});
+        if (user) {
+            switch (skill) {
+                case "development":
+                    await User.findOneAndUpdate({user_email: user.user_email}, {
+                        'user_score.development': score
+                    });
+                    return res.json({message: "Mise à jour du score effectuée", success: true})
+                case "creativity":
+                    await User.findOneAndUpdate({user_email: user.user_email}, {
+                        'user_score.creativity': score
+                    });
+                    return res.json({message: "Mise à jour du score effectuée", success: true})
+                case "marketing":
+                    await User.findOneAndUpdate({user_email: user.user_email}, {
+                        'user_score.marketing': score
+                    });
+                    return res.json({message: "Mise à jour du score effectuée", success: true})
+                default:
+                    return res.status(400).json({message: "Invalid skill", success: false});
+            }
+        } else {
+            return res.status(400).json({message: "User not found", success: false});
+        }
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({message: "Internal server error", success: false, error: e});
+    }
+});
+
 
 router.post("/user/weapon/choose", async function (req, res) {
     console.log("une requete sur /user/weapon/choose");
