@@ -20,6 +20,9 @@ interface SessionState {
     }
 }
 
+type Skill = "development" | "creativity" | "marketing";
+
 export type {
-    SessionState
+    SessionState,
+    Skill
 }

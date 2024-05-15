@@ -19,6 +19,17 @@
   justify-content: center;
   align-items: center;
 
+  .counter {
+    position: absolute;
+    top: 1rem;
+    right: 50%;
+    transform: translateX(50%);
+    font-family: 'MedievalSharp', cursive;
+    font-size: 3rem;
+    color: #C73030;
+
+  }
+
   &.intro, &.forest-2 {
     .intro-actions, .forest-actions {
       position: absolute;

@@ -55,6 +55,14 @@ function App() {
         if (location.pathname.includes("/game")) {
             document.getElementById("root")?.classList.add("game");
         }
+
+        // if game not in location remove all audio playing
+        if (!location.pathname.includes("/game")) {
+            const audio = document.querySelectorAll("audio");
+            audio.forEach((a) => {
+                a.pause();
+            });
+        }
     }, [location]);
 
     return (

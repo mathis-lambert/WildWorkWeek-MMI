@@ -1,5 +1,4 @@
-import {Link} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import './GameManager.scss';
 import useAssetLoader from "../../hooks/UseAssetLoader.tsx";
 import BoutiqueObjet from "../../components/BoutiqueObjet/BoutiqueObjet.tsx";
@@ -12,18 +11,35 @@ import {URL} from "../../app/socket.ts";
 import Enigme from "../../components/Enigme/Enigme.tsx";
 import toggleFullScreen from "../../utils/ToggleFullscreen.ts";
 import playSound from "../../utils/PlaySound.ts";
+import {useLocation, useNavigate} from "react-router-dom";
+import setScoreToSkill from "../../utils/SetScoreToSkill.ts";
+import addScoreToSkill from "../../utils/AddScoreToSkill.ts";
 
 const GameManager = () => {
     const [loading, setLoading] = useState(true);
-    // const location = useLocation();
+    const location = useLocation();
+    const navigate = useNavigate();
     const [sceneNumber, setSceneNumber] = useState<string>("");
     const [sceneHistory, setSceneHistory] = useState<string[]>([])
-    const [tavernAudio, setTavernAudio] = useState<HTMLAudioElement | undefined>(undefined)
+    const [boutiqueSoundPlaying, setBoutiqueSoundPlaying] = useState(false)
     const [tavernSoundPlaying, setTavernSoundPlaying] = useState(false)
-    const [avanceAudio, setAvanceAudio] = useState<HTMLAudioElement | undefined>(undefined)
+    const [forestSoundPlaying, setForestSoundPlaying] = useState(false)
+    const [villageSoundPlaying, setVillageSoundPlaying] = useState(false)
+    const [moutainSoundPlaying, setMoutainSoundPlaying] = useState(false)
+    const [forgeSoundPlaying, setForgeSoundPlaying] = useState(false)
     const [avanceSoundPlaying, setAvanceSoundPlaying] = useState(false)
+    const [mountainCount, setMountainCount] = useState(15)
 
-    const session = useSelector((state: SessionState) => state.session);
+    const boutiqueAudioRef = useRef<HTMLAudioElement | null>(null);
+    const tavernAudioRef = useRef<HTMLAudioElement | null>(null);
+    const forestAudioRef = useRef<HTMLAudioElement | null>(null);
+    const villageAudioRef = useRef<HTMLAudioElement | null>(null);
+    const avanceAudioRef = useRef<HTMLAudioElement | null>(null);
+    const mountainAudioRef = useRef<HTMLAudioElement | null>(null);
+    const forgeAudioRef = useRef<HTMLAudioElement | null>(null);
+
+
+    const session: SessionState["session"] = useSelector((state: SessionState) => state.session);
     const dispatch = useDispatch();
 
     const assets = [
@@ -71,10 +87,20 @@ const GameManager = () => {
         "/videos/village.mp4",
         "/images/forest-2.jpg",
         "/sounds/avance.mp3",
+        "/sounds/shop-music.mp3",
+        "/sounds/forest-music.mp3",
+        "/sounds/village-music.mp3",
+        "/sounds/mountain-music.mp3",
+        "/sounds/collapsing.mp3",
+        "/sounds/forge-music.mp3",
         "/videos/escape-village.mp4",
         "/videos/animated-frog.mp4",
-        "/images/gardien-village.webp"
-
+        "/images/gardien-village.webp",
+        "/videos/mountain-collapse.mp4",
+        "/videos/mountain-exit-1.mp4",
+        "/videos/mountain-exit-2.mp4",
+        "/videos/forge.mp4",
+        "/images/blacksmith.webp",
     ]
 
     const assetsLoaded = useAssetLoader(assets);
@@ -88,17 +114,56 @@ const GameManager = () => {
 
     useEffect(() => {
         sceneHistory.push(sceneNumber);
-        console.log(sceneHistory)
     }, [sceneHistory, sceneNumber]);
 
     useEffect(() => {
         if (sceneNumber) {
-            if (sceneNumber.match(/^2\.[0-9]+$/) && !tavernSoundPlaying && sceneNumber !== "2.4") {
-                setTavernAudio(playSound("/sounds/tavern-music.mp3", true));
+            if (sceneNumber.match(/^1(\.[0-9]+)+$/) && !boutiqueSoundPlaying) {
+                boutiqueAudioRef.current = playSound("/sounds/shop-music.mp3", true);
+                setBoutiqueSoundPlaying(true);
+            } else if (tavernSoundPlaying && !sceneNumber.match(/^1(\.[0-9]+)+$/)) {
+                setBoutiqueSoundPlaying(false);
+                boutiqueAudioRef.current?.pause();
+            }
+
+            if (sceneNumber.match(/^2(\.[0-9]+)+$/) && !tavernSoundPlaying && sceneNumber !== "2.4") {
+                tavernAudioRef.current = playSound("/sounds/tavern-music.mp3", true);
                 setTavernSoundPlaying(true);
-            } else if (tavernSoundPlaying && !sceneNumber.match(/^2\.[0-9]+$/)) {
+            } else if (tavernSoundPlaying && !sceneNumber.match(/^2(\.[0-9]+)+$/)) {
                 setTavernSoundPlaying(false);
-                tavernAudio?.pause();
+                tavernAudioRef.current?.pause();
+            }
+
+            if (sceneNumber.match(/^3(\.[0-9]+)+$/) && !forestSoundPlaying) {
+                forestAudioRef.current = playSound("/sounds/forest-music.mp3", true);
+                setForestSoundPlaying(true);
+            } else if (forestSoundPlaying && !sceneNumber.match(/^3(\.[0-9]+)+$/)) {
+                forestAudioRef.current?.pause();
+                setForestSoundPlaying(false);
+            }
+
+            if (sceneNumber.match(/^4(\.[0-9]+)+$/) && !villageSoundPlaying) {
+                villageAudioRef.current = playSound("/sounds/village-music.mp3", true);
+                setVillageSoundPlaying(true);
+            } else if (villageSoundPlaying && !sceneNumber.match(/^4(\.[0-9]+)+$/)) {
+                villageAudioRef.current?.pause();
+                setVillageSoundPlaying(false);
+            }
+
+            if (sceneNumber.match(/^5(\.[0-9]+)+$/) && !moutainSoundPlaying) {
+                mountainAudioRef.current = playSound("/sounds/mountain-music.mp3", true);
+                setMoutainSoundPlaying(true);
+            } else if (moutainSoundPlaying && !sceneNumber.match(/^5(\.[0-9]+)+$/)) {
+                mountainAudioRef.current?.pause();
+                setMoutainSoundPlaying(false);
+            }
+
+            if (sceneNumber.match(/^6(\.[0-9]+)+$/) && !forgeSoundPlaying) {
+                forgeAudioRef.current = playSound("/sounds/forge-music.mp3", true);
+                setForgeSoundPlaying(true);
+            } else if (forgeSoundPlaying && !sceneNumber.match(/^6(\.[0-9]+)+$/)) {
+                forgeAudioRef.current?.pause();
+                setForgeSoundPlaying(false);
             }
 
             if (sceneNumber === "3.2.1") {
@@ -109,14 +174,59 @@ const GameManager = () => {
             }
 
             if (sceneNumber === "4.0" && !avanceSoundPlaying) {
-                setAvanceAudio(playSound("/sounds/avance.mp3", true))
+                avanceAudioRef.current = playSound("/sounds/avance.mp3", true);
                 setAvanceSoundPlaying(true)
             } else if (sceneNumber !== "4.0" && avanceSoundPlaying) {
-                avanceAudio?.pause();
+                avanceAudioRef.current?.pause();
                 setAvanceSoundPlaying(false)
             }
+
+            if (sceneNumber === "5.1") {
+                playSound("/sounds/collapsing.mp3", false)
+            }
         }
-    }, [sceneNumber, tavernAudio, tavernSoundPlaying]);
+    }, [avanceSoundPlaying, boutiqueSoundPlaying, forestSoundPlaying, forgeSoundPlaying, moutainSoundPlaying, sceneNumber, tavernSoundPlaying, villageSoundPlaying]);
+
+    useEffect(() => {
+        if (sceneNumber === "5.1") {
+            setMountainCount(15);
+            const interval = setInterval(() => {
+                setMountainCount(prevCount => {
+                    if (prevCount === 1) {
+                        clearInterval(interval);
+                        return 0;
+                    }
+                    return prevCount - 1;
+                });
+            }, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [sceneNumber]);
+
+    useEffect(() => {
+        if (!location.pathname.includes("/game")) {
+            return () => {
+               stopAllAudio();
+            };
+        }
+    }, [location]);
+
+    const stopAllAudio = () => {
+        boutiqueAudioRef.current?.pause();
+        tavernAudioRef.current?.pause();
+        forestAudioRef.current?.pause();
+        villageAudioRef.current?.pause();
+        mountainAudioRef.current?.pause();
+        forgeAudioRef.current?.pause();
+        avanceAudioRef.current?.pause();
+    }
+
+    useEffect(() => {
+        if (mountainCount === 0) {
+            setSceneNumber("5.0");
+        }
+    }, [mountainCount]);
 
 
     const loadGame = () => {
@@ -125,46 +235,6 @@ const GameManager = () => {
 
     if (loading) {
         return <div>Loading...</div>; // or a loading spinner
-    }
-
-    const addScoreToSkill = async (skill: "development" | "creativity" | "marketing", score: number) => {
-        const response = await fetch(`${URL}/user/score/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + session.user_session_token
-            },
-            body: JSON.stringify({skill: skill, score: score}),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            dispatch(updateScore({skill: skill, score: score}))
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    const setScoreToSkill = async (skill: "development" | "creativity" | "marketing", score: number) => {
-        const response = await fetch(`${URL}/user/score/set`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + session.user_session_token
-            },
-            body: JSON.stringify({skill: skill, score: score}),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            dispatch(setScore({skill: skill, score: score}))
-            return true;
-        } else {
-            return false;
-        }
     }
 
     const selectWeapon = async (weapon: 'bague' | 'gant' | 'lunettes' | 'aucun') => {
@@ -226,14 +296,19 @@ const GameManager = () => {
                 }}>Back
                 </button>
                 <button onClick={async () => {
-                    if (await setScoreToSkill("development", 0) && await setScoreToSkill("creativity", 0) && await setScoreToSkill("marketing", 0)) {
+                    if (await setScoreToSkill(session, "development", 0, (p) => {dispatch(setScore(p))}) &&
+                        await setScoreToSkill(session,"creativity", 0, (p) => {dispatch(setScore(p))}) &&
+                        await setScoreToSkill(session, "marketing", 0, (p) => {dispatch(setScore(p))})) {
                         console.log("Scores reset")
                     } else {
                         alert("Une erreur est survenue. Veuillez réessayer.");
                     }
                 }}>Reset scores
                 </button>
-                <Link to={"/"}>Back to home</Link>
+                <button onClick={() => {
+                    stopAllAudio();
+                    navigate("/");
+                }}>Retour à l'accueil</button>
             </div>
 
             {sceneNumber === "0.0" && (
@@ -311,7 +386,7 @@ const GameManager = () => {
                                         <p>Cette bague incrustée de cristaux luminescents, octroie à son porteur le
                                             pouvoir de manipuler les objets à distance grâce à la télékinésie.</p>
                                         <button onClick={async () => {
-                                            if (await addScoreToSkill("creativity", 20) && await selectWeapon("bague")) {
+                                            if (await addScoreToSkill(session, "creativity", 20, (p) => {dispatch(updateScore(p))}) && await selectWeapon("bague")) {
                                                 setSceneNumber("1.2");
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -327,7 +402,7 @@ const GameManager = () => {
                                         <p>Un gant colossal, forgé dans le métal le plus résistant, confère à son
                                             porteur une force surhumaine dans le bras qu'il équipe.</p>
                                         <button onClick={async () => {
-                                            if (await addScoreToSkill("development", 20) && await selectWeapon("gant")) {
+                                            if (await addScoreToSkill(session, "development", 20, (p) => {dispatch(updateScore(p))}) && await selectWeapon("gant")) {
                                                 setSceneNumber("1.2");
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -342,7 +417,7 @@ const GameManager = () => {
                                         <p>Ces lunettes sinistres, confèrent à leur porteur un pouvoir de contrôle
                                             mental redoutable.</p>
                                         <button onClick={async () => {
-                                            if (await addScoreToSkill("marketing", 20) && await selectWeapon("lunettes")) {
+                                            if (await addScoreToSkill(session, "marketing", 20, (p) => {dispatch(updateScore(p))}) && await selectWeapon("lunettes")) {
                                                 setSceneNumber("1.2");
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -384,7 +459,7 @@ const GameManager = () => {
                                     <h3>JADA</h3>
                                     <p>Jada est un Kiblun dynamique, agile et intelligent, logique et curieux.</p>
                                     <button onClick={async () => {
-                                        if (await addScoreToSkill("development", 20) && await selectCompanion("jada")) {
+                                        if (await addScoreToSkill(session,"development", 20, (p) => {dispatch(updateScore(p))}) && await selectCompanion("jada")) {
                                             setSceneNumber("1.3");
                                         } else {
                                             alert("Une erreur est survenue. Veuillez réessayer.");
@@ -399,7 +474,7 @@ const GameManager = () => {
                                     <p>Maugy est un Kiblun doté d'un esprit créatif et d'une grande ouverture d'esprit.
                                         Il apporte une touche de magie et de fantaisie.</p>
                                     <button onClick={async () => {
-                                        if (await addScoreToSkill("creativity", 20) && await selectCompanion("maugy")) {
+                                        if (await addScoreToSkill(session, "creativity", 20, (p) => {dispatch(updateScore(p))}) && await selectCompanion("maugy")) {
                                             setSceneNumber("1.3");
                                         } else {
                                             alert("Une erreur est survenue. Veuillez réessayer.");
@@ -414,7 +489,7 @@ const GameManager = () => {
                                     <p>Ploucou est un petit Kiblun fin stratege doté d’une forte capacité d’analyse et
                                         très sociable.</p>
                                     <button onClick={async () => {
-                                        if (await addScoreToSkill("marketing", 20) && await selectCompanion("ploucou")) {
+                                        if (await addScoreToSkill(session, "marketing", 20, (p) => {dispatch(updateScore(p))}) && await selectCompanion("ploucou")) {
                                             setSceneNumber("1.3");
                                         } else {
                                             alert("Une erreur est survenue. Veuillez réessayer.");
@@ -543,7 +618,7 @@ const GameManager = () => {
                             type={"text"}
                             onValidate={async (response) => {
                                 if (response === "print") {
-                                    if (await addScoreToSkill("development", 10)) {
+                                    if (await addScoreToSkill(session, "development", 10, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("2.2.1.1");
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -564,7 +639,7 @@ const GameManager = () => {
                         <Dialog open={true} title={"- Le barman :"}
                                 content={"Bravo ! Tu as réussi l'épreuve de bon-sens. Tu as gagné 10 points en développement."}
                                 onClose={async () => {
-                                    if (await addScoreToSkill("development", 10)) {
+                                    if (await addScoreToSkill(session, "development", 10, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("2.3");
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -627,7 +702,7 @@ const GameManager = () => {
                             onValidate={async (response) => {
                                 console.log(response)
                                 if (response === "correct") {
-                                    if (await addScoreToSkill("creativity", 10)) {
+                                    if (await addScoreToSkill(session, "creativity", 10, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("2.2.2.1")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -655,7 +730,7 @@ const GameManager = () => {
                         <Dialog open={true} title={"- Le barman :"}
                                 content={"Bravo ! Tu as réussi l'épreuve de créativité. Tu as gagné 10 points en création numérique."}
                                 onClose={async () => {
-                                    if (await addScoreToSkill("creativity", 10)) {
+                                    if (await addScoreToSkill(session, "creativity", 10, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("2.3");
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -694,7 +769,7 @@ const GameManager = () => {
                             onValidate={async (response) => {
                                 console.log(response)
                                 if (response === "correct") {
-                                    if (await addScoreToSkill("marketing", 10)) {
+                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("2.2.3.1");
                                     }
                                 } else {
@@ -716,7 +791,7 @@ const GameManager = () => {
                         <Dialog open={true} title={"- Le barman :"}
                                 content={"Bravo ! Tu as réussi l'épreuve de social. Tu as gagné 10 points en marketing."}
                                 onClose={async () => {
-                                    if (await addScoreToSkill("marketing", 10)) {
+                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("2.3");
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -775,7 +850,7 @@ const GameManager = () => {
                                     playSound("/sounds/voice-death-lezard.wav", false);
                                 }}
                                 onValidate={async () => {
-                                    if (await addScoreToSkill("marketing", 10)) {
+                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("3.1.2")
                                     }
                                 }}
@@ -819,7 +894,7 @@ const GameManager = () => {
                                     {
                                         text: "Ta voix",
                                         onClick: async () => {
-                                            if (await addScoreToSkill("marketing", 10)) {
+                                            if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
                                                 setSceneNumber("3.2.3")
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -829,7 +904,7 @@ const GameManager = () => {
                                     {
                                         text: "Ta main dominante",
                                         onClick: async () => {
-                                            if (await addScoreToSkill("creativity", 10)) {
+                                            if (await addScoreToSkill(session, "creativity", 10, (p) => {dispatch(updateScore(p))})) {
                                                 setSceneNumber("3.2.2")
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -839,7 +914,7 @@ const GameManager = () => {
                                     {
                                         text: "Ta mémoire",
                                         onClick: async () => {
-                                            if (await addScoreToSkill("development", 10)) {
+                                            if (await addScoreToSkill(session, "development", 10, (p) => {dispatch(updateScore(p))})) {
                                                 setSceneNumber("3.2.1")
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -865,7 +940,7 @@ const GameManager = () => {
                         answer={"andré"}
                         onValidate={async (answer) => {
                             if (answer.toLowerCase() === "andré") {
-                                if (await addScoreToSkill("development", 20)) {
+                                if (await addScoreToSkill(session, "development", 20, (p) => {dispatch(updateScore(p))})) {
                                     setSceneNumber("3.3")
                                 } else {
                                     alert("Une erreur est survenue. Veuillez réessayer.");
@@ -902,7 +977,7 @@ const GameManager = () => {
                             }]}
                             onValidate={async (answer) => {
                                 if (answer.toLowerCase() === "correct") {
-                                    if (await addScoreToSkill("creativity", 20)) {
+                                    if (await addScoreToSkill(session, "creativity", 20, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("3.3")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -941,7 +1016,7 @@ const GameManager = () => {
                             }]}
                             onValidate={async (answer) => {
                                 if (answer.toLowerCase() === "correct") {
-                                    if (await addScoreToSkill("marketing", 10)) {
+                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("3.3")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1079,7 +1154,7 @@ const GameManager = () => {
                                     answer: "avance",
                                     onValidate: async (answer) => {
                                         if (answer.toLowerCase() === "avance" || answer.toLowerCase() === "j'avance" || answer.toLowerCase() === "avancer") {
-                                            if (await addScoreToSkill("marketing", 10)) {
+                                            if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
                                                 setSceneNumber("4.1.2")
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1161,7 +1236,7 @@ const GameManager = () => {
                             answer={"attention aux gaz toxiques"}
                             onValidate={async (answer) => {
                                 if (answer.toLowerCase() === "attention aux gaz toxiques") {
-                                    if (await addScoreToSkill("development", 30)) {
+                                    if (await addScoreToSkill(session, "development", 30, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("4.4")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1284,7 +1359,7 @@ const GameManager = () => {
                             }}
                             onValidate={async (answer) => {
                                 if (answer.toLowerCase() === "correct") {
-                                    if (await addScoreToSkill("creativity", 30)) {
+                                    if (await addScoreToSkill(session, "creativity", 30, (p) => {dispatch(updateScore(p))})) {
                                         setSceneNumber("5.0")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1319,8 +1394,170 @@ const GameManager = () => {
                     <div className="boutique">
                         <video src="/videos/mountain.mp4" className={"background"} autoPlay={true} muted={false}/>
 
+                        <LocationCTA
+                            top={60}
+                            left={45}
+                            width={10}
+                            height={10}
+                            onClick={() => {
+                                setSceneNumber("5.1")
+                            }}
+                            debug={true}
+                        />
+
+                        <BoutiqueObjet
+                            top={12}
+                            left={38}
+                            width={20}
+                            height={40}
+                            modal={{
+                                title: "Low Poly",
+                                content: "Ce low poly a été réalisé par un étudiant en première année. Le projet avait pour but d'apprendre aux étudiants à utiliser Illustrator. Ils devaient se représenter en utilisant de nombreux triangles. Le low poly devait reproduire au mieux l’image choisie au départ."
+                            }}
+                        />
+                        <BoutiqueObjet
+                            top={46}
+                            left={24}
+                            width={15}
+                            height={20}
+                            modal={{
+                                title: "Court-métrage",
+                                content: "Dans le cadre d'un projet universitaire, nous avons dû réaliser un court métrage sur le thème du feu. Notre film, intitulé \"Le Grand Froid\", suit l'histoire de Bruno, un jeune aventurier pris au piège dans une tempête de neige. Malgré les obstacles logistiques et météorologiques, nous avons su filmer, monter et produire ce court métrage, démontrant ainsi notre passion et notre compétence dans le domaine de l'audiovisuel."
+                            }}
+                        />
+
                         <Dialog open={true}
-                                content={"Vous êtes au pied de la montagne, a quelques heures de votre but. La pause est terminée, ou allez vous ? "}
+                                content={"Vous êtes au pied de la montagne, a quelques heures de votre but. La pause est terminée, où allez vous ? "}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "5.1" && (
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/mountain-collapse.mp4" className={"background"} autoPlay={true}
+                               muted={false}/>
+
+
+                        <div className="counter">
+                            <h2>{mountainCount}</h2>
+                        </div>
+
+                        <LocationCTA
+                            // dev
+                            top={60}
+                            left={45}
+                            width={13}
+                            height={15}
+                            onClick={async () => {
+                                if (await addScoreToSkill(session, "development", 20, (p) => {dispatch(updateScore(p))})) {
+                                    setSceneNumber("5.2.1")
+                                } else {
+                                    alert("Une erreur est survenue. Veuillez réessayer.");
+                                }
+                            }}
+                            debug={true}
+                        />
+
+                        <LocationCTA
+                            // crea
+                            top={40}
+                            left={60}
+                            width={13}
+                            height={15}
+                            onClick={async () => {
+                                console.log("CREA")
+                                if (await addScoreToSkill(session, "creativity", 20, (p) => {dispatch(updateScore(p))})) {
+                                    setSceneNumber("5.2.1")
+                                } else {
+                                    alert("Une erreur est survenue. Veuillez réessayer.");
+                                }
+                            }}
+                            debug={true}
+                        />
+
+                        <LocationCTA
+                            // com
+                            top={60}
+                            left={20}
+                            width={13}
+                            height={15}
+                            onClick={async () => {
+                                if (await addScoreToSkill(session, "marketing", 20, (p) => {dispatch(updateScore(p))})) {
+                                    setSceneNumber("5.2.2")
+                                } else {
+                                    alert("Une erreur est survenue. Veuillez réessayer.");
+                                }
+                            }}
+                            debug={true}
+                        />
+
+                        <Dialog open={true}
+                                content={"Trouvez un moyen de traverser la montagne effondrée."}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "5.2.1" && (
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/mountain-exit-1.mp4" className={"background"} autoPlay={true}
+                               muted={false}/>
+
+                        <Dialog open={true}
+                                content={"Vous avez réussi a éviter les gros rochers qui menaçaient vôtre vie. Vous faite maintenant route vers le sommet."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("6.0")}
+                                validateText={"Continuer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "5.2.2" && (
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/mountain-exit-2.mp4" className={"background"} autoPlay={true}
+                               muted={false}/>
+
+                        <Dialog open={true}
+                                content={"Vous aviez abandonné, pensant que tout était perdu. Une créature  colossale est venue à votre secours. Cette créature vous semble-t-elle  familière ? Si ce n’est pas le cas, peut-être n’êtes-vous qu’un lâche...  Vous faites maintenant route vers le sommet."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("6.0")}
+                                validateText={"Continuer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "6.0" && (
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/forge.mp4" className={"background"} autoPlay={true}
+                               muted={false}/>
+
+                        <Dialog open={true}
+                                content={"Apres votre longue aventure, vous arrivez enfin a la forge de l’Aube. Elle est magnifique et scintillante, peut-être comme votre parcours ?"}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("6.1")}
+                                validateText={"Continuer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "6.1" && (
+                <div className="scene">
+                    <div className="boutique">
+                        <img src="/images/blacksmith.webp" className={"background"} alt="forge"/>
+
+                        <Dialog open={true}
+                                content={"Il est maintenant temps pour vous d’utiliser toute votre expériences et vos aventures !"}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("6.0")}
+                                validateText={"Continuer"}
                         />
                     </div>
                 </div>
