@@ -48,10 +48,15 @@ const GameManager = () => {
         "/images/epreuve_com/epreuve_com2-post3.png",
         "/images/epreuve_com/epreuve_com2-post4.png",
         "/images/epreuve_crea/epreuve_crea-P1.png",
+        "/images/epreuve_crea/epreuve_crea3-P1.jpg",
         "/images/epreuve_crea/epreuve_crea-P2.png",
+        "/images/epreuve_crea/epreuve_crea3-P2.jpg",
         "/images/epreuve_crea/epreuve_crea-P3.png",
+        "/images/epreuve_crea/epreuve_crea3-P3.jpg",
         "/images/epreuve_crea/epreuve_crea-P4.png",
+        "/images/epreuve_crea/epreuve_crea3-P4.jpg",
         "/images/epreuve_crea/epreuve_crea-main.png",
+        "/images/epreuve_crea/epreuve_crea3-main.png",
         "/images/epreuve_crea/epreuve_crea2-logo1.png",
         "/images/epreuve_crea/epreuve_crea2-logo2.png",
         "/images/epreuve_crea/epreuve_crea2-logo3.png",
@@ -61,6 +66,7 @@ const GameManager = () => {
         "/videos/meet-lezard.mp4",
         "/videos/death-lezard.mp4",
         "/videos/pass-lezard.mp4",
+        "/videos/mountain.mp4",
         "/videos/village-entry.mp4",
         "/videos/village.mp4",
         "/images/forest-2.jpg",
@@ -1224,11 +1230,97 @@ const GameManager = () => {
                         <img src="/images/exit-village.webp" className={"background"} alt="village"/>
 
                         <Dialog open={true}
-                                content={"Une porte vous barre la route...\n" +
-                                    "Vous appercevez une affiche déchiré sur la porte..."}
+                                content={"Une porte vous barre la route...Vous apercevez une affiche déchiré sur la porte..."}
                                 showClose={false} showValidate={true}
                                 onValidate={() => setSceneNumber("5.0")}
-                                validateText={"Continuer"}
+                                validateText={"Casser la porte"}
+                        />
+
+                        <LocationCTA
+                            top={30}
+                            left={30}
+                            width={40}
+                            height={40}
+                            onClick={() => setSceneNumber("4.5.1")}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.5.1" && (
+                // PORTE DE SORTIE
+                <div className="scene">
+                    <div className="boutique">
+                        <img src="/images/exit-village.webp" className={"background"} alt="village"/>
+
+                        <Enigme
+                            text={"Quel est le mot de passe pour ouvrir la porte ?"}
+                            type={"puzzle"}
+                            puzzleImages={{
+                                original: "/images/epreuve_crea/epreuve_crea3-main.png",
+                                pieces: [
+                                    {
+                                        url: "/images/epreuve_crea/epreuve_crea3-P1.jpg",
+                                        answer: "incorrect"
+                                    },
+                                    {
+                                        url: "/images/epreuve_crea/epreuve_crea3-P2.jpg",
+                                        answer: "incorrect"
+                                    },
+                                    {
+                                        url: "/images/epreuve_crea/epreuve_crea3-P3.jpg",
+                                        answer: "incorrect"
+                                    },
+                                    {
+                                        url: "/images/epreuve_crea/epreuve_crea3-P4.jpg",
+                                        answer: "correct"
+                                    }]
+                            }}
+                            puzzleDragZone={{
+                                top: 40,
+                                left: 79,
+                                width: 15,
+                                height: 50
+                            }}
+                            onValidate={async (answer) => {
+                                if (answer.toLowerCase() === "correct") {
+                                    if (await addScoreToSkill("creativity", 30)) {
+                                        setSceneNumber("5.0")
+                                    } else {
+                                        alert("Une erreur est survenue. Veuillez réessayer.");
+                                    }
+                                } else {
+                                    setSceneNumber("4.5.1.1")
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.5.1.1" && (
+                // PORTE DE SORTIE
+                <div className="scene">
+                    <div className="boutique">
+                        <img src="/images/exit-village.webp" className={"background"} alt="village"/>
+
+                        <Dialog open={true}
+                                content={"ARG ! Mauvaise réponse. Vous avez une autre chance."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("4.5.1")}
+                                validateText={"Réessayer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "5.0" && (
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/mountain.mp4" className={"background"} autoPlay={true} muted={false}/>
+
+                        <Dialog open={true}
+                                content={"Vous êtes au pied de la montagne, a quelques heures de votre but. La pause est terminée, ou allez vous ? "}
                         />
                     </div>
                 </div>

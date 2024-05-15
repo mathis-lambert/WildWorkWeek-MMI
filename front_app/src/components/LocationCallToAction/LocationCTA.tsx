@@ -6,13 +6,15 @@ interface LocationCTAProps {
     left: number;
     width: number;
     height: number;
+    image?: string;
     onClick: () => void;
+    debug?: boolean;
 }
 
 const LocationCTA = (props: LocationCTAProps) => {
     return (
         <div
-            className={"location-cta" + (props.className ? ` ${props.className}` : "")}
+            className={"location-cta" + (props.className ? ` ${props.className}` : "") + (props.debug ? " debug" : "")}
             style={{
                 top: `${props.top}%`,
                 left: `${props.left}%`,
@@ -21,6 +23,7 @@ const LocationCTA = (props: LocationCTAProps) => {
             }}
             onClick={props.onClick}
         >
+            {props.image && <img src={props.image} alt=""/>}
         </div>
     );
 }

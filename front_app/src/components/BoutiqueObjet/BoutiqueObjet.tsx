@@ -12,6 +12,7 @@ interface BoutiqueObjetProps {
         content: string;
     };
     debug?: boolean;
+    image?: string;
 }
 
 const BoutiqueObjet = (props: BoutiqueObjetProps) => {
@@ -19,8 +20,14 @@ const BoutiqueObjet = (props: BoutiqueObjetProps) => {
 
     return (
         <>
-            <LocationCTA top={props.top} left={props.left} width={props.width} height={props.height}
-                         onClick={() => setOpen(true)} className={"boutique-objet " + (props.debug ? "debug" : "")}/>
+            <LocationCTA top={props.top}
+                         left={props.left}
+                         width={props.width}
+                         height={props.height}
+                         onClick={() => setOpen(true)}
+                         className={"boutique-objet " + (props.debug ? "debug" : "")}
+                         image={props.image}
+            />
 
             <Modal open={open} title={props.modal.title} content={props.modal.content} onClose={() => setOpen(false)}/>
         </>
