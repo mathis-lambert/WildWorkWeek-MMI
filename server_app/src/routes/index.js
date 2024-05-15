@@ -137,7 +137,7 @@ router.post("/user/score/add", async function (req, res) {
 });
 
 router.post("/user/score/set", async function (req, res) {
-    console.log("une requete sur /user/score/add");
+    console.log("une requete sur /user/score/set");
     console.log(req.body)
     console.log(req.headers.authorization)
 

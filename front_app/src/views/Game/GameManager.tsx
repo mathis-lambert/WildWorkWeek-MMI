@@ -5,27 +5,26 @@ import BoutiqueObjet from "../../components/BoutiqueObjet/BoutiqueObjet.tsx";
 import LocationCTA from "../../components/LocationCallToAction/LocationCTA.tsx";
 import Dialog from "../../components/Dialog/Dialog.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {chooseCompanion, chooseWeapon, setScore, updateScore} from "../../features/session/sessionSlice.ts";
+import {chooseCompanion, chooseWeapon, updateScore} from "../../features/session/sessionSlice.ts";
 import {SessionState} from "../../types/Types.ts";
 import {URL} from "../../app/socket.ts";
 import Enigme from "../../components/Enigme/Enigme.tsx";
-import toggleFullScreen from "../../utils/ToggleFullscreen.ts";
 import playSound from "../../utils/PlaySound.ts";
-import {useLocation, useNavigate} from "react-router-dom";
-import setScoreToSkill from "../../utils/SetScoreToSkill.ts";
+import {useLocation} from "react-router-dom";
 import addScoreToSkill from "../../utils/AddScoreToSkill.ts";
+// import DevLayout from "../../components/Layout/Game/DevLayout.tsx";
+import GameLayout from "../../components/Layout/Game/GameLayout.tsx";
 
 const GameManager = () => {
     const [loading, setLoading] = useState(true);
     const location = useLocation();
-    const navigate = useNavigate();
     const [sceneNumber, setSceneNumber] = useState<string>("");
     const [sceneHistory, setSceneHistory] = useState<string[]>([])
     const [boutiqueSoundPlaying, setBoutiqueSoundPlaying] = useState(false)
     const [tavernSoundPlaying, setTavernSoundPlaying] = useState(false)
     const [forestSoundPlaying, setForestSoundPlaying] = useState(false)
     const [villageSoundPlaying, setVillageSoundPlaying] = useState(false)
-    const [moutainSoundPlaying, setMoutainSoundPlaying] = useState(false)
+    const [mountainSoundPlaying, setMountainSoundPlaying] = useState(false)
     const [forgeSoundPlaying, setForgeSoundPlaying] = useState(false)
     const [avanceSoundPlaying, setAvanceSoundPlaying] = useState(false)
     const [mountainCount, setMountainCount] = useState(15)
@@ -53,7 +52,7 @@ const GameManager = () => {
         "/images/companions/compagnon_dev.png",
         "/images/companions/compagnon_crea.png",
         "/images/companions/compagnon_com.png",
-        "/images/taverne.jpg",
+        "/images/taverne.png",
         "/images/tavern-game.webp",
         "/sounds/exit-tavern.wav",
         "/images/epreuve_com/epreuve_com_img1.jpeg",
@@ -150,12 +149,12 @@ const GameManager = () => {
                 setVillageSoundPlaying(false);
             }
 
-            if (sceneNumber.match(/^5(\.[0-9]+)+$/) && !moutainSoundPlaying) {
+            if (sceneNumber.match(/^5(\.[0-9]+)+$/) && !mountainSoundPlaying) {
                 mountainAudioRef.current = playSound("/sounds/mountain-music.mp3", true);
-                setMoutainSoundPlaying(true);
-            } else if (moutainSoundPlaying && !sceneNumber.match(/^5(\.[0-9]+)+$/)) {
+                setMountainSoundPlaying(true);
+            } else if (mountainSoundPlaying && !sceneNumber.match(/^5(\.[0-9]+)+$/)) {
                 mountainAudioRef.current?.pause();
-                setMoutainSoundPlaying(false);
+                setMountainSoundPlaying(false);
             }
 
             if (sceneNumber.match(/^6(\.[0-9]+)+$/) && !forgeSoundPlaying) {
@@ -185,7 +184,7 @@ const GameManager = () => {
                 playSound("/sounds/collapsing.mp3", false)
             }
         }
-    }, [avanceSoundPlaying, boutiqueSoundPlaying, forestSoundPlaying, forgeSoundPlaying, moutainSoundPlaying, sceneNumber, tavernSoundPlaying, villageSoundPlaying]);
+    }, [avanceSoundPlaying, boutiqueSoundPlaying, forestSoundPlaying, forgeSoundPlaying, mountainSoundPlaying, sceneNumber, tavernSoundPlaying, villageSoundPlaying]);
 
     useEffect(() => {
         if (sceneNumber === "5.1") {
@@ -279,37 +278,8 @@ const GameManager = () => {
 
     return (
         <>
-            <div className="game-layout">
-                <h1>GameLayout</h1>
-                <p>Current scene: {sceneNumber}</p>
-                <p>Current user: {session.user_firstname} {session.user_lastname}</p>
-                <p>Current
-                    score: {session.user_score.development} {session.user_score.creativity} {session.user_score.marketing}</p>
-                <p>Current weapon: {session.user_weapon}</p>
-                <p>Current companion: {session.user_companion}</p>
-                <button onClick={() => toggleFullScreen(document.getElementById("root"))}>Fullscreen</button>
-                <input type="text" value={sceneNumber} onChange={(e) => setSceneNumber(e.target.value)}
-                       placeholder="Scene number"/>
-                <button onClick={() => {
-                    setSceneNumber(sceneHistory[sceneHistory.length - 2])
-                    setSceneHistory(sceneHistory.slice(0, sceneHistory.length - 2))
-                }}>Back
-                </button>
-                <button onClick={async () => {
-                    if (await setScoreToSkill(session, "development", 0, (p) => {dispatch(setScore(p))}) &&
-                        await setScoreToSkill(session,"creativity", 0, (p) => {dispatch(setScore(p))}) &&
-                        await setScoreToSkill(session, "marketing", 0, (p) => {dispatch(setScore(p))})) {
-                        console.log("Scores reset")
-                    } else {
-                        alert("Une erreur est survenue. Veuillez réessayer.");
-                    }
-                }}>Reset scores
-                </button>
-                <button onClick={() => {
-                    stopAllAudio();
-                    navigate("/");
-                }}>Retour à l'accueil</button>
-            </div>
+            {/*<DevLayout sceneNumber={sceneNumber} setSceneNumber={(n: string) => setSceneNumber(n)} sceneHistory={sceneHistory} setSceneHistory={(h) => setSceneHistory(h)} stopAllAudio={stopAllAudio}/>*/}
+            <GameLayout setSceneNumber={(n: string) => setSceneNumber(n)} sceneHistory={sceneHistory} setSceneHistory={(h) => setSceneHistory(h)} stopAllAudio={stopAllAudio}/>
 
             {sceneNumber === "0.0" && (
                 <div className={"scene intro"}>
@@ -522,7 +492,7 @@ const GameManager = () => {
             {sceneNumber === "2.0" && (
                 <div className={"scene"}>
                     <div className="boutique">
-                        <img src={'/images/taverne.jpg'} alt="background" className="background"/>
+                        <img src={'/images/taverne.png'} alt="background" className="background"/>
 
                         <Dialog open={true}
                                 content={"Mais quelle joyeuse ambiance ! Il y a des gens partout, des rires, des chansons, des verres qui s'entrechoquent. C'est agréable ici. "}
@@ -807,7 +777,7 @@ const GameManager = () => {
             {sceneNumber === "2.3" && (
                 <div className="scene">
                     <div className="boutique">
-                        <img src={'/images/taverne.jpg'} alt="background" className="background"/>
+                        <img src={'/images/taverne.png'} alt="background" className="background"/>
 
                         <LocationCTA top={35} left={59} width={15} height={50} onClick={() => {
                             // DOOR EXIT TAVERN BEGIN SCENE 2.3
@@ -1147,7 +1117,7 @@ const GameManager = () => {
                         <Dialog open={true}
                                 content={"En arrivant au village, vous êtes confronté à un spectacle lugubre : le village est complètement abandonné et un gaz toxique s'échappe des habitations. Une voix faible semble vous appeler. Que faites-vous ?"}
                                 showClose={false} showValidate={true}
-                                onValidate={() => setSceneNumber("4.1.2")}
+                                onValidate={() => setSceneNumber("4.1.1")}
                                 validateText={"Choisir un autre chemin"}
                                 enigme={{
                                     type: "text",
@@ -1193,7 +1163,7 @@ const GameManager = () => {
                         <Dialog open={true}
                                 content={"Vous décidez donc de contourner le village du côté opposé à la voix afin de ne pas être touché par le gaz. En passant, les fantômes semblent se moquer de vous... En même temps, vous les abandonnez, vous aussi. Juste avant de partir, vous vous retrouvez devant une grande porte avec une pierre  cassée en son centre."}
                                 showClose={false} showValidate={true}
-                                onValidate={() => setSceneNumber("4.1.2")}
+                                onValidate={() => setSceneNumber("4.5")}
                                 validateText={"Continuer"}
                         />
                     </div>

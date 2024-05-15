@@ -15,11 +15,19 @@ const ProfilCard = () => {
             </div>
             <div className="profil-card__inventory">
                 <div className={"item"}>
-                    <div className="icon"></div>
+                    <div className="icon">
+                        {session.user_weapon === "gant" && <img src="/images/objets-magiques/gant.png" alt="gant"/>}
+                        {session.user_weapon === "lunettes" && <img src="/images/objets-magiques/glasses.png" alt="epee"/>}
+                        {session.user_weapon === "bague" && <img src="/images/objets-magiques/bague.png" alt="bague"/>}
+                    </div>
                     <span>MON ARME</span>
                 </div>
                 <div className={"item"}>
-                    <div className="icon"></div>
+                    <div className="icon">
+                        {session.user_companion === "maugy" && <img src="/images/companions/compagnon_crea.png" alt="maugy"/>}
+                        {session.user_companion === "ploucou" && <img src="/images/companions/compagnon_com.png" alt="ploucou"/>}
+                        {session.user_companion === "jada" && <img src="/images/companions/compagnon_dev.png" alt="jada"/>}
+                    </div>
                     <span>MON COMPAGNON</span>
                 </div>
                 <div className={"item"}>

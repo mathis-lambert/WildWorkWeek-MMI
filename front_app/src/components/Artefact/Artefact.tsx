@@ -1,14 +1,18 @@
 import './Artefact.scss';
 // import {useSelector} from "react-redux";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
+import {getHsl} from "../../utils/ColorsUtils.ts";
+import {useSelector} from "react-redux";
+import {SessionState} from "../../types/Types.ts";
 
 const Artefact = () => {
-    // const session = useSelector((state) => state.session);
-    const [hue, setHue] = useState(0);
+    const session = useSelector((state: SessionState) => state.session);
+
+    const [hsl, setHsl] = useState([0, 0, 0]);
 
     const handleMouseOver = (e: React.MouseEvent<HTMLImageElement>) => {
         const target = e.target as HTMLImageElement;
-        target.style.filter = `drop-shadow(0 0 40px hsla(${hue}, 100%, 50%, 0.45))`;
+        target.style.filter = `drop-shadow(0 0 40px hsla(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%, 0.45))`;
     };
 
     const handleMouseOut = (e: React.MouseEvent<HTMLImageElement>) => {
@@ -16,23 +20,17 @@ const Artefact = () => {
         target.style.filter = ``;
     };
 
-    // const artefactColors = () => {
-    //     const devColor = "hsla(0, 100%, 50%, 1)";
-    //     const designColor = "hsla(240, 100%, 50%, 1)";
-    //     const dataColor = "hsla(120, 100%, 50%, 1)";
-    //
-    //     // mix colors depending on the user's skills
-    //     let color = "hsla(0, 100%, 50%, 1)";
-    // }
+    useEffect(() => {
+        setHsl(getHsl(session));
+    }, [session]);
 
     return (
         <div className={"artefact"}>
             <div className="artefact-scroll">
                 <h1 className={"artefact-title"}>Mon artefact magique</h1>
-                <input type={'range'} min={0} max={360} value={hue} onChange={(e) => setHue(parseInt(e.target.value))}/>
                 <div className="artefact-picture" onMouseOver={handleMouseOver}
                      onMouseOut={handleMouseOut}>
-                    <img src="/images/artefact/base.png" alt="artefact" style={{filter: `hue-rotate(${hue}deg)`}}/>
+                    <img src="/images/artefact/base.png" alt="artefact" style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(${hsl[2]}%)`}}/>
                 </div>
                 <div className="artefact-description">
                     <p>Mon artefact est un artefact magique qui me permet de réaliser des projets incroyables. Il est

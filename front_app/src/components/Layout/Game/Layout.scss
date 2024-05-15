@@ -1,0 +1,111 @@
+.dev-layout {
+  position: fixed;
+  inset: 0;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 999;
+
+  button, input, a {
+    pointer-events: all;
+  }
+}
+
+.game-layout {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+
+  .top-right {
+    position: absolute;
+    top: 1rem;
+    right: calc(-250px + 2.5rem);
+    width: 250px;
+    background-image: var(--gradient-radial-secondary);
+    border-radius: 15px;
+    padding: 0.5rem;
+    font-family: 'MedievalSharp', cursive;
+    pointer-events: all;
+
+    transition: right 300ms;
+
+    display: flex;
+
+    .chevron {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .crystal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+
+      img {
+        width: 7rem;
+        height: 7rem;
+      }
+    }
+
+    .score {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+
+      .progress {
+        width: 100%;
+        height: 0.5rem;
+        background-color: #000;
+        border-radius: 15px;
+
+        .progress-bar {
+          height: 0.5rem;
+          transition: width 300ms;
+          border-radius: 15px;
+
+          &.dev {
+            background-color: var(--developement);
+            filter: drop-shadow(0 0 5px var(--developement));
+          }
+
+          &.crea {
+            background-color: var(--graphic-design);
+            filter: drop-shadow(0 0 5px var(--graphic-design));
+          }
+
+          &.mark {
+            background-color: var(--marketing);
+            filter: drop-shadow(0 0 5px var(--marketing));
+          }
+        }
+      }
+    }
+
+    &.show {
+      right: 1rem;
+    }
+  }
+
+  .bottom-left {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background-image: var(--gradient-radial-secondary);
+    border-radius: 15px;
+    padding: 0.5rem;
+    font-family: 'MedievalSharp', cursive;
+    pointer-events: all;
+
+    transition: left 300ms;
+
+    display: flex;
+    gap: 0.5rem;
+  }
+
+}
