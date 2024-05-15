@@ -19,11 +19,10 @@
   justify-content: center;
   align-items: center;
 
-  &.intro {
-    .intro-actions {
+  &.intro, &.forest-2 {
+    .intro-actions, .forest-actions {
       position: absolute;
         bottom: 1rem;
-        left: 50%;
 
       button {
         font-family: 'MedievalSharp', cursive;
@@ -35,7 +34,17 @@
         cursor: pointer;
         width: fit-content;
         float: right;
+        pointer-events: all;
       }
+    }
+
+    .intro-actions {
+      left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .forest-actions {
+      right: 1rem;
     }
   }
 

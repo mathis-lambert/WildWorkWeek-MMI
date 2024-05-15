@@ -1,4 +1,4 @@
-import {Link, useLocation} from "react-router-dom";
+import {Link} from "react-router-dom";
 import {useEffect, useState} from "react";
 import './GameManager.scss';
 import useAssetLoader from "../../hooks/UseAssetLoader.tsx";
@@ -20,6 +20,8 @@ const GameManager = () => {
     const [sceneHistory, setSceneHistory] = useState<string[]>([])
     const [tavernAudio, setTavernAudio] = useState<HTMLAudioElement | undefined>(undefined)
     const [tavernSoundPlaying, setTavernSoundPlaying] = useState(false)
+    const [avanceAudio, setAvanceAudio] = useState<HTMLAudioElement | undefined>(undefined)
+    const [avanceSoundPlaying, setAvanceSoundPlaying] = useState(false)
 
     const session = useSelector((state: SessionState) => state.session);
     const dispatch = useDispatch();
@@ -59,6 +61,13 @@ const GameManager = () => {
         "/videos/meet-lezard.mp4",
         "/videos/death-lezard.mp4",
         "/videos/pass-lezard.mp4",
+        "/videos/village-entry.mp4",
+        "/videos/village.mp4",
+        "/images/forest-2.jpg",
+        "/sounds/avance.mp3",
+        "/videos/escape-village.mp4",
+        "/videos/animated-frog.mp4",
+        "/images/gardien-village.webp"
 
     ]
 
@@ -77,19 +86,29 @@ const GameManager = () => {
     }, [sceneHistory, sceneNumber]);
 
     useEffect(() => {
-        if (sceneNumber.match(/^2\.[0-9]+$/) && !tavernSoundPlaying && sceneNumber !== "2.4") {
-            setTavernAudio(playSound("/sounds/tavern-music.mp3", true));
-            setTavernSoundPlaying(true);
-        } else if (!sceneNumber.includes("2.") && tavernSoundPlaying) {
-            setTavernSoundPlaying(false);
-            tavernAudio?.pause();
-        }
+        if (sceneNumber) {
+            if (sceneNumber.match(/^2\.[0-9]+$/) && !tavernSoundPlaying && sceneNumber !== "2.4") {
+                setTavernAudio(playSound("/sounds/tavern-music.mp3", true));
+                setTavernSoundPlaying(true);
+            } else if (tavernSoundPlaying && !sceneNumber.match(/^2\.[0-9]+$/)) {
+                setTavernSoundPlaying(false);
+                tavernAudio?.pause();
+            }
 
-        if (sceneNumber === "3.2.1") {
-            console.log("%cBravo ! tu as eu l'idée d'ouvrir la console de développement", "color: red; font-size: 20px;");
-            console.log("%cTu as gagné 10 points en développement", "color: red; font-size: 20px;");
-            console.log("%cMon nom est 'André'", "color: red; font-size: 20px;");
-            console.log("%cTu peux continuer l'aventure", "color: red; font-size: 20px;");
+            if (sceneNumber === "3.2.1") {
+                console.log("%cBravo ! tu as eu l'idée d'ouvrir la console de développement", "color: red; font-size: 20px;");
+                console.log("%cTu as gagné 10 points en développement", "color: red; font-size: 20px;");
+                console.log("%cMon nom est 'André'", "color: red; font-size: 20px;");
+                console.log("%cTu peux continuer l'aventure", "color: red; font-size: 20px;");
+            }
+
+            if (sceneNumber === "4.0" && !avanceSoundPlaying) {
+                setAvanceAudio(playSound("/sounds/avance.mp3", true))
+                setAvanceSoundPlaying(true)
+            } else if (sceneNumber !== "4.0" && avanceSoundPlaying) {
+                avanceAudio?.pause();
+                setAvanceSoundPlaying(false)
+            }
         }
     }, [sceneNumber, tavernAudio, tavernSoundPlaying]);
 
@@ -206,7 +225,8 @@ const GameManager = () => {
                     } else {
                         alert("Une erreur est survenue. Veuillez réessayer.");
                     }
-                }}>Reset scores</button>
+                }}>Reset scores
+                </button>
                 <Link to={"/"}>Back to home</Link>
             </div>
 
@@ -748,7 +768,11 @@ const GameManager = () => {
                                     setSceneNumber("3.1.1")
                                     playSound("/sounds/voice-death-lezard.wav", false);
                                 }}
-                                onValidate={() => setSceneNumber("3.1.2")}
+                                onValidate={async () => {
+                                    if (await addScoreToSkill("marketing", 10)) {
+                                        setSceneNumber("3.1.2")
+                                    }
+                                }}
                                 validateText={"Parler au lézard"}
                                 closeText={"Tuer le lézard"}
                         />
@@ -911,7 +935,7 @@ const GameManager = () => {
                             }]}
                             onValidate={async (answer) => {
                                 if (answer.toLowerCase() === "correct") {
-                                    if (await addScoreToSkill("marketing", 20)) {
+                                    if (await addScoreToSkill("marketing", 10)) {
                                         setSceneNumber("3.3")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -945,7 +969,6 @@ const GameManager = () => {
             )}
 
             {sceneNumber === "3.3" && (
-                // MARKETING SCENE
                 <div className="scene">
                     <div className="boutique">
                         <video src="/videos/pass-lezard.mp4" className={"background"} autoPlay={true} muted={false}/>
@@ -954,8 +977,258 @@ const GameManager = () => {
                                 title={"- Le lézard :"}
                                 content={"Humain, ta valeur te permet d'accéder à cette forêt. En définitive, ma  question était superflue. Je cherchais simplement à m'assurer que tu ne  portais pas une intention destructrice. Mon existence encore présente me donne la réponse que je cherchais."}
                                 showClose={false} showValidate={true}
-                                onValidate={() => setSceneNumber("4.0")}
+                                onValidate={() => setSceneNumber("3.4")}
                                 validateText={"Continuer l'aventure"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "3.4" && (
+                <div className="scene forest-2">
+                    <div className="boutique">
+                        <img src="/images/forest-2.jpg" className={"background"} alt="forest"/>
+
+
+                        <div className="forest-actions">
+                            <button onClick={() => setSceneNumber("3.5")}>Sortir de la fôret</button>
+                        </div>
+
+                        <BoutiqueObjet
+                            top={40}
+                            left={10}
+                            width={15}
+                            height={10}
+                            modal={{
+                                title: "PROV'ANSE",
+                                content: "La conception de ce logo a été réalisée en septembre 2023 dans le cadre d’un projet fictif pour mon cours de marketing. L’objectif était de concevoir une marque locale de vêtements tout en intégrant ses objectifs marketing. Nous avons choisi de créer des t-shirts mettant en avant les villes de la région PACA. Ainsi, nous avons nommé notre marque « Prov’anse », pour mettre en avant la Provence et son lien avec la Méditerranée."
+                            }}
+                        />
+
+                        <BoutiqueObjet
+                            top={11}
+                            left={32}
+                            width={10}
+                            height={10}
+                            modal={{
+                                title: "BURGER",
+                                content: "Ces maquettes de sites UX ont été réalisées par des étudiants en deuxième année de MMI. Le projet consistait à développer un site fonctionnel permettant de personnaliser sa commande et certains aliments."
+                            }}
+                        />
+
+                        <BoutiqueObjet
+                            top={40}
+                            left={25}
+                            width={10}
+                            height={23}
+                            modal={{
+                                title: "GROTTE",
+                                content: "Cette grotte a été modélisée en 3D par des étudiants en deuxième année, parcours création numérique. Le projet consistait à créer un environnement inspiré du film « Au centre de la Terre ». La grotte en 3D a été projetée en arrière-plan lors du spectacle de fin d’année des danseurs du Lycée Dumont d’Urville."
+                            }}
+                        />
+
+                        <BoutiqueObjet
+                            top={50}
+                            left={55}
+                            width={45}
+                            height={40}
+                            modal={{
+                                title: "LAC",
+                                content: "Cette visite virtuelle sous-marine de Port-Cros a été réalisée par deux étudiants en troisième année de MMI, parcours création numérique, lors d’un projet visant à découvrir le parc naturel et sensibiliser à la préservation de l’environnement."
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "3.5" && (
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/village-entry.mp4" className={"background"} autoPlay={true} muted={false}/>
+
+                        <Dialog open={true}
+                                content={"Vous avez enfin quitté la forêt. Avez-vous apprécié votre immersion dans la nature ? Tout individu ordinaire est capable de vivre en harmonie avec les animaux, et c'est véritablement magnifique... Vos pas vous mènent maintenant vers le village de Prov’anse, ou ce qu’il en reste..."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => {
+                                    setSceneNumber("4.0")
+                                }}
+                                validateText={"Continuer l'aventure"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.0" && (
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/village.mp4" className={"background"} autoPlay={true} muted={false}/>
+
+                        <Dialog open={true}
+                                content={"En arrivant au village, vous êtes confronté à un spectacle lugubre : le village est complètement abandonné et un gaz toxique s'échappe des habitations. Une voix faible semble vous appeler. Que faites-vous ?"}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("4.1.2")}
+                                validateText={"Choisir un autre chemin"}
+                                enigme={{
+                                    type: "text",
+                                    answer: "avance",
+                                    onValidate: async (answer) => {
+                                        if (answer.toLowerCase() === "avance" || answer.toLowerCase() === "j'avance" || answer.toLowerCase() === "avancer") {
+                                            if (await addScoreToSkill("marketing", 10)) {
+                                                setSceneNumber("4.1.2")
+                                            } else {
+                                                alert("Une erreur est survenue. Veuillez réessayer.");
+                                            }
+                                        } else {
+                                            setSceneNumber("4.0.1")
+                                        }
+                                    }
+                                }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.0.1" && (
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/village.mp4" className={"background"} autoPlay={true} muted={false}/>
+
+                        <Dialog open={true}
+                                content={"ARG ! Mauvaise réponse. Vous avez une autre chance."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("4.0")}
+                                validateText={"Réessayer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.1.1" && (
+                // LEAVE VILLAGE
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/escape-village.mp4" className={"background"} autoPlay={true} muted={false}/>
+
+                        <Dialog open={true}
+                                content={"Vous décidez donc de contourner le village du côté opposé à la voix afin de ne pas être touché par le gaz. En passant, les fantômes semblent se moquer de vous... En même temps, vous les abandonnez, vous aussi. Juste avant de partir, vous vous retrouvez devant une grande porte avec une pierre  cassée en son centre."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("4.1.2")}
+                                validateText={"Continuer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.1.2" && (
+                // AVANCE
+                <div className="scene">
+                    <div className="boutique">
+                        <img src="/images/gardien-village.webp" className={"background"} alt="village"/>
+
+                        <Dialog open={true}
+                                content={"Vous vous trouvez face à face avec un gardien Atmosud. Ces créatures sont le  reflet de l'âme des aventuriers et peuvent apparaître pour les plus courageux dans les situations les plus critiques. \n" +
+                                    "Le vôtre semble essayer de vous dire quelque chose... Parviendrez-vous à comprendre son  message ?"}
+                                buttons={[
+                                    {
+                                        text: "Déchiffrer le message",
+                                        onClick: () => setSceneNumber("4.2")
+                                    },
+                                    {
+                                        text: "Rebrousser chemin",
+                                        onClick: () => setSceneNumber("4.3")
+                                    }
+                                ]}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.2" && (
+                // AVANCE
+                <div className="scene">
+                    <div className="boutique">
+                        <img src="/images/gardien-village.webp" className={"background"} alt="village"/>
+
+                        <Enigme
+                            text={"“Buufoujpo bvy hba upyjrvft”"}
+                            type={"text"}
+                            answer={"attention aux gaz toxiques"}
+                            onValidate={async (answer) => {
+                                if (answer.toLowerCase() === "attention aux gaz toxiques") {
+                                    if (await addScoreToSkill("development", 30)) {
+                                        setSceneNumber("4.4")
+                                    } else {
+                                        alert("Une erreur est survenue. Veuillez réessayer.");
+                                    }
+                                } else {
+                                    setSceneNumber("4.2.1")
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.2.1" && (
+                // AVANCE
+                <div className="scene">
+                    <div className="boutique">
+                        <img src="/images/gardien-village.webp" className={"background"} alt="village"/>
+
+                        <Dialog open={true}
+                                content={"ARG ! Mauvaise réponse. Vous avez une autre chance."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("4.2")}
+                                validateText={"Réessayer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.3" && (
+                // AVANCE
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/escape-village.mp4" className={"background"} autoPlay={true} muted={false}/>
+
+                        <Dialog open={true}
+                                content={"Vous décidez de rebrousser chemin. Vous n'avez pas réussi à comprendre le message du gardien. Vous avez peur de vous aventurer dans ce village abandonné. Vous décidez de partir."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("4.5")}
+                                validateText={"Continuer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.4" && (
+                // AVANCE
+                <div className="scene">
+                    <div className="boutique">
+                        <video src="/videos/animated-frog.mp4" className={"background"} autoPlay={true} muted={false}/>
+
+                        <Dialog open={true}
+                                content={"Après que vous ayez pris le temps de déchiffrer l’avertissement du  gardien, il s’éleva et fit disparaître le gaz, vous laissant l’accès à la traversée du village."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("4.5")}
+                                validateText={"Continuer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "4.5" && (
+                // PORTE DE SORTIE
+                <div className="scene">
+                    <div className="boutique">
+                        <img src="/images/exit-village.webp" className={"background"} alt="village"/>
+
+                        <Dialog open={true}
+                                content={"Une porte vous barre la route...\n" +
+                                    "Vous appercevez une affiche déchiré sur la porte..."}
+                                showClose={false} showValidate={true}
+                                onValidate={() => setSceneNumber("5.0")}
+                                validateText={"Continuer"}
                         />
                     </div>
                 </div>

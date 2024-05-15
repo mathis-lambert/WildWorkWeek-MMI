@@ -10,9 +10,31 @@
   font-family: 'MedievalSharp', cursive;
   color: #3F2200;
 
-  .buttons {
+  .dialog-actions {
     display: flex;
+    justify-content: space-between;
+    width: 100%;
     gap: 1rem;
+
+    .enigme-dialog {
+      display: flex;
+      gap: 1rem;
+
+      input {
+        border-radius: 8px;
+        font-family: 'MedievalSharp', cursive;
+        background-color: transparent;
+        padding: 0.5rem 1.25rem;
+        font-size: 1.2rem;
+        color: #3F2200;
+        transition: color 300ms, filter 300ms;
+      }
+    }
+
+    .buttons {
+        display: flex;
+        gap: 1rem;
+    }
   }
 
   button {
@@ -20,7 +42,7 @@
     font-family: 'MedievalSharp', cursive;
     background-image: var(--gradient-radial-secondary);
     padding: 0.5rem 1.25rem;
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: #fff;
     transition: color 300ms, filter 300ms;
     cursor: pointer;
