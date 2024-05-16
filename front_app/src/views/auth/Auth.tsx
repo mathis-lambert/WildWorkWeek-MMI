@@ -81,7 +81,7 @@ const Auth = () => {
                     <div className="artefact">
                         <img src="/images/artefact/main.png" alt="artefact"/>
                     </div>
-                    <h2>Register</h2>
+                    <h2>Inscription</h2>
                     <Form
                         fields={[
                             {
@@ -134,7 +134,7 @@ const Auth = () => {
                     <div className="artefact">
                         <img src="/images/artefact/main.png" alt="artefact"/>
                     </div>
-                    <h2>Login</h2>
+                    <h2>Connexion</h2>
                     <Form
                         fields={[
                             {

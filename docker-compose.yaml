@@ -3,23 +3,25 @@ services:
     build: ./front_app
     ports:
       - "3000:3000"
+    volumes:
+      - ./front_app/docker.env:/front_app/.env
     depends_on:
       - server_app
     restart: always
     networks:
       - www_mmi
 
-
   server_app:
     build: ./server_app
     ports:
       - "3001:3001"
+    volumes:
+      - ./server_app/docker.env:/app/.env
     depends_on:
         - mongo
     restart: always
     networks:
       - www_mmi
-
 
   mongo:
     image: mongo:latest

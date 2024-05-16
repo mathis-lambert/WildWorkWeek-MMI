@@ -47,15 +47,15 @@ const DevLayout = ({setSceneNumber, sceneHistory, setSceneHistory, stopAllAudio}
                          style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(90%)`}}/>
                 </div>
                 <div className="score">
-                    <p>Development</p>
+                    <p>Développement</p>
                     <div className="progress">
                         <div className="progress-bar dev" style={{width: getPercentage("development") + "%"}}/>
                     </div>
-                    <p>Creativity</p>
+                    <p>Créativité</p>
                     <div className="progress">
                         <div className="progress-bar crea" style={{width: getPercentage("creativity") + "%"}}/>
                     </div>
-                    <p>Marketing</p>
+                    <p>Stratégie com</p>
                     <div className="progress">
                         <div className="progress-bar mark" style={{width: getPercentage("marketing") + "%"}}/>
                     </div>
