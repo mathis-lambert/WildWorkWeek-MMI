@@ -1,7 +1,18 @@
 .location-cta {
   position: absolute;
-    cursor: pointer;
-    pointer-events: all;
+  cursor: pointer;
+  pointer-events: all;
+
+  .image-cta {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transition: transform 300ms, scale 300ms;
+
+    &:hover {
+      scale: 1.05;
+    }
+  }
 
   &.debug {
     border: 1px solid red;

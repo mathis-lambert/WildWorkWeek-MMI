@@ -40,7 +40,7 @@ const DevLayout = ({setSceneNumber, sceneHistory, setSceneHistory, stopAllAudio}
         <div className="game-layout">
             <div className={"top-right " + (showTopRight ? "show" : "")}>
                 <div className="chevron" onClick={() => setShowTopRight(!showTopRight)}>
-                    {showTopRight ? <ChevronLeft/> : <ChevronRight/>}
+                    {showTopRight ? <ChevronRight/> : <ChevronLeft/>}
                 </div>
                 <div className="crystal">
                     <img src="/images/artefact/base.png" alt="Crystal"

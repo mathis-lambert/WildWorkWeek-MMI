@@ -9,6 +9,7 @@ interface LocationCTAProps {
     image?: string;
     onClick: () => void;
     debug?: boolean;
+    rotation?: number;
 }
 
 const LocationCTA = (props: LocationCTAProps) => {
@@ -23,7 +24,7 @@ const LocationCTA = (props: LocationCTAProps) => {
             }}
             onClick={props.onClick}
         >
-            {props.image && <img src={props.image} alt=""/>}
+            {props.image && <img src={props.image} alt="" style={{transform: `rotate(${props.rotation || 0}deg)`}} className="image-cta"/>}
         </div>
     );
 }

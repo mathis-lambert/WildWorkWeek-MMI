@@ -9,14 +9,13 @@ import {chooseCompanion, chooseWeapon, updateScore} from "../../features/session
 import {SessionState} from "../../types/Types.ts";
 import Enigme from "../../components/Enigme/Enigme.tsx";
 import playSound from "../../utils/PlaySound.ts";
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import addScoreToSkill from "../../utils/AddScoreToSkill.ts";
 // import DevLayout from "../../components/Layout/Game/DevLayout.tsx";
 import GameLayout from "../../components/Layout/Game/GameLayout.tsx";
 import selectWeapon from "../../utils/SelectWeapon.ts";
 import selectCompanion from "../../utils/SelectCompanion.ts";
 import Loader from "../../components/Loader/Loader.tsx";
-import {useNavigate} from "react-router-dom";
 import {getHsl} from "../../utils/ColorsUtils.ts";
 
 const GameManager = () => {
@@ -1157,7 +1156,7 @@ const GameManager = () => {
                             modal={{
                                 title: "Logo PROV'ANSE",
                                 content: "La conception de ce logo a été réalisée en septembre 2023 dans le cadre d’un projet fictif pour mon cours de marketing. L’objectif était de concevoir une marque locale de vêtements tout en intégrant ses objectifs marketing. Nous avons choisi de créer des t-shirts mettant en avant les villes de la région PACA. Ainsi, nous avons nommé notre marque « Prov’anse », pour mettre en avant la Provence et son lien avec la Méditerranée.",
-                                image: "/images/realisations/provanse.png"
+                                image: "/images/realisations/provanse.png",
                             }}
                         />
 
@@ -1169,7 +1168,8 @@ const GameManager = () => {
                             modal={{
                                 title: "Site Livraison nourriture",
                                 content: "Ces maquettes de sites UX ont été réalisées par des étudiants en deuxième année de MMI. Le projet consistait à développer un site fonctionnel permettant de personnaliser sa commande et certains aliments.",
-                                image: "/images/realisations/sites-nourriture.png"
+                                image: "/images/realisations/sites-nourriture.png",
+                                orientation: "column"
                             }}
                         />
 
@@ -1181,7 +1181,7 @@ const GameManager = () => {
                             modal={{
                                 title: "GROTTE 3D",
                                 content: "Cette grotte a été modélisée en 3D par des étudiants en deuxième année, parcours création numérique. Le projet consistait à créer un environnement inspiré du film « Au centre de la Terre ». La grotte en 3D a été projetée en arrière-plan lors du spectacle de fin d’année des danseurs du Lycée Dumont d’Urville.",
-                                video: "/images/realisations/video-grotte.mp4"
+                                video: "/images/realisations/video-grotte.mp4",
                             }}
                         />
 
@@ -1193,7 +1193,8 @@ const GameManager = () => {
                             modal={{
                                 title: "Visite virtuelle sous-marine",
                                 content: "Cette visite virtuelle sous-marine de Port-Cros a été réalisée par deux étudiants en troisième année de MMI, parcours création numérique, lors d’un projet visant à découvrir le parc naturel et sensibiliser à la préservation de l’environnement.",
-                                image: "/images/realisations/vr-lac.png"
+                                image: "/images/realisations/vr-lac.png",
+                                orientation: "column"
                             }}
                         />
                     </div>
@@ -1394,11 +1395,12 @@ const GameManager = () => {
                         />
 
                         <LocationCTA
-                            top={30}
-                            left={30}
-                            width={40}
-                            height={40}
+                            top={45}
+                            left={45}
+                            width={10}
+                            height={20}
                             onClick={() => setSceneNumber("4.5.1")}
+                            image={"/images/parchment.png"}
                         />
                     </div>
                 </div>
@@ -1486,7 +1488,8 @@ const GameManager = () => {
                             onClick={() => {
                                 setSceneNumber("5.1")
                             }}
-                            debug={true}
+                            image={"/images/fleche.png"}
+                            rotation={-40}
                         />
 
                         <BoutiqueObjet
@@ -1534,9 +1537,9 @@ const GameManager = () => {
 
                         <LocationCTA
                             // dev
-                            top={60}
-                            left={45}
-                            width={13}
+                            top={65}
+                            left={47}
+                            width={8}
                             height={15}
                             onClick={async () => {
                                 if (await addScoreToSkill(session, "development", 20, (p) => {
@@ -1547,15 +1550,16 @@ const GameManager = () => {
                                     alert("Une erreur est survenue. Veuillez réessayer.");
                                 }
                             }}
-                            debug={true}
+                            image={"/images/fleche.png"}
+                            rotation={-40}
                         />
 
                         <LocationCTA
                             // crea
-                            top={40}
-                            left={60}
-                            width={13}
-                            height={15}
+                            top={45}
+                            left={65}
+                            width={8}
+                            height={10}
                             onClick={async () => {
                                 console.log("CREA")
                                 if (await addScoreToSkill(session, "creativity", 20, (p) => {
@@ -1566,14 +1570,15 @@ const GameManager = () => {
                                     alert("Une erreur est survenue. Veuillez réessayer.");
                                 }
                             }}
-                            debug={true}
+                            image={"/images/fleche.png"}
+                            rotation={-90}
                         />
 
                         <LocationCTA
                             // com
-                            top={60}
-                            left={20}
-                            width={13}
+                            top={63}
+                            left={18}
+                            width={10}
                             height={15}
                             onClick={async () => {
                                 if (await addScoreToSkill(session, "marketing", 20, (p) => {
@@ -1584,7 +1589,8 @@ const GameManager = () => {
                                     alert("Une erreur est survenue. Veuillez réessayer.");
                                 }
                             }}
-                            debug={true}
+                            image={"/images/fleche.png"}
+                            rotation={110}
                         />
 
                         <Dialog open={true}
@@ -1664,7 +1670,7 @@ const GameManager = () => {
 
                         <div className={"artefact"}>
                             <img src="/images/artefact/base.png" alt="artefact"
-                            style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(100%)`}}/>
+                                 style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(100%) drop-shadow(0 0 20px hsv(${hsl[0]}, ${hsl[1]}%, 75%))`}}/>
                         </div>
 
                         <Dialog open={true}
