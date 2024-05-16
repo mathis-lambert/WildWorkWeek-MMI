@@ -1670,7 +1670,7 @@ const GameManager = () => {
 
                         <div className={"artefact"}>
                             <img src="/images/artefact/base.png" alt="artefact"
-                                 style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(100%) drop-shadow(0 0 20px hsv(${hsl[0]}, ${hsl[1]}%, 75%))`}}/>
+                                 style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(100%)`}}/>
                         </div>
 
                         <Dialog open={true}
