@@ -18,11 +18,11 @@ const Navbar = () => {
                         MMI
                     </Link>
                 </li>
-                <li className={`navbar-item ${location.pathname === "/projects" ? "active" : ""}`}>
-                    <Link to="/projects">
-                        Projets
-                    </Link>
-                </li>
+                {/*<li className={`navbar-item ${location.pathname === "/projects" ? "active" : ""}`}>*/}
+                {/*    <Link to="/projects">*/}
+                {/*        Projets*/}
+                {/*    </Link>*/}
+                {/*</li>*/}
             </ul>
         </nav>
     );
