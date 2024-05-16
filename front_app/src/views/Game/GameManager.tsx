@@ -1678,6 +1678,12 @@ const GameManager = () => {
                                 showClose={false} showValidate={true}
                                 onValidate={() => {
                                     stopAllAudio()
+
+                                    // remove full screen
+                                    if (document.fullscreenElement) {
+                                        document.exitFullscreen()
+                                    }
+
                                     navigate("/")
                                 }}
                                 validateText={"Terminer l'aventure"}
