@@ -67,7 +67,11 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, "public")));
 
 // routes
-app.use("/", indexRouter);
+app.use("/api", indexRouter);
+
+app.get("/", (req, res) => {
+    res.json({message: "Hello World!"});
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
