@@ -7,7 +7,9 @@ import {ArrowLeft, ChevronLeft, ChevronRight, Home, Maximize, RefreshCw} from "r
 import {useEffect, useState} from "react";
 import {getHsl} from "../../../utils/ColorsUtils.ts";
 import setScoreToSkill from "../../../utils/SetScoreToSkill.ts"
-import {setScore} from "../../../features/session/sessionSlice.ts";
+import {chooseCompanion, chooseWeapon, setScore} from "../../../features/session/sessionSlice.ts";
+import selectWeapon from "../../../utils/SelectWeapon.ts";
+import selectCompanion from "../../../utils/SelectCompanion.ts";
 
 interface GameLayoutProps {
     setSceneNumber: (scene: string) => void;
@@ -42,7 +44,7 @@ const DevLayout = ({setSceneNumber, sceneHistory, setSceneHistory, stopAllAudio}
                 </div>
                 <div className="crystal">
                     <img src="/images/artefact/base.png" alt="Crystal"
-                         style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(${hsl[2]}%)`}}/>
+                         style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(90%)`}}/>
                 </div>
                 <div className="score">
                     <p>Development</p>
@@ -72,20 +74,23 @@ const DevLayout = ({setSceneNumber, sceneHistory, setSceneHistory, stopAllAudio}
                     navigate("/");
                 }}><Home size={18}/></button>
                 <button onClick={async () => {
-                    if (confirm("Voulez-vous vraiment réinitialiser vos scores ?")) {
+                    if (confirm("Voulez-vous vraiment réinitialiser votre profil ?")) {
                         if (await setScoreToSkill(session, "development", 0, (p) => {
-                                console.log(p)
                                 dispatch(setScore(p))
                             }) &&
                             await setScoreToSkill(session, "creativity", 0, (p) => {
-                                console.log(p)
                                 dispatch(setScore(p))
                             }) &&
                             await setScoreToSkill(session, "marketing", 0, (p) => {
-                                console.log(p)
                                 dispatch(setScore(p))
+                            }) &&
+                            await selectWeapon(session, "aucun", (p) => {
+                                dispatch(chooseWeapon(p))
+                            }) &&
+                            await selectCompanion(session, "aucun", (p) => {
+                                dispatch(chooseCompanion(p))
                             })) {
-                            console.log("Scores reset")
+                            console.log("Account reset")
                         } else {
                             alert("Une erreur est survenue. Veuillez réessayer.");
                         }

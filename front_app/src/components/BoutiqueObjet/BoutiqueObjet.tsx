@@ -10,9 +10,13 @@ interface BoutiqueObjetProps {
     modal: {
         title: string;
         content: string;
+        image?: string;
+        video?: string;
+        orientation?: "row" | "column";
     };
     debug?: boolean;
     image?: string;
+
 }
 
 const BoutiqueObjet = (props: BoutiqueObjetProps) => {
@@ -29,7 +33,7 @@ const BoutiqueObjet = (props: BoutiqueObjetProps) => {
                          image={props.image}
             />
 
-            <Modal open={open} title={props.modal.title} content={props.modal.content} onClose={() => setOpen(false)}/>
+            <Modal open={open} title={props.modal.title} content={props.modal.content} onClose={() => setOpen(false)} image={props.modal.image} video={props.modal.video} orientation={props.modal.orientation}/>
         </>
 
     );

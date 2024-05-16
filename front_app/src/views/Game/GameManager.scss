@@ -125,10 +125,13 @@
   .card {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     gap: 1rem;
     min-width: 250px;
     padding: 1rem;
-    background-color: rgba(255, 255, 255, 0.25);
+    background-image: var(--gradient-radial-secondary);
+    border: 5px solid #132434;
     border-radius: 8px;
     backdrop-filter: blur(5px);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -136,10 +139,46 @@
     cursor: pointer;
     pointer-events: all;
 
+    &:hover {
+      transform: scale(1.05);
+    }
+
     img {
       width: 100px;
       height: 100px;
       object-fit: contain;
+    }
+
+    h3 {
+      font-family: 'MedievalSharp', cursive;
+      font-size: 1.25rem;
+      color: #fff;
+      // 2 lines
+        text-align: center;
+    }
+
+    p {
+      font-family: 'MedievalSharp', cursive;
+      font-size: 0.75rem;
+      color: #fff;
+      // 2 lines
+        text-align: center;
+    }
+
+    button {
+        font-family: 'MedievalSharp', cursive;
+        background-image: var(--gradient-radial-primary);
+        padding: 0.5rem 1.25rem;
+        font-size: 1.2rem;
+        color: #fff;
+        transition: color 300ms, filter 300ms;
+        cursor: pointer;
+        width: fit-content;
+        pointer-events: all;
+
+      &:hover {
+        filter: brightness(1.25) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+      }
     }
   }
 

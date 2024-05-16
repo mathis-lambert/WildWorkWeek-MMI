@@ -26,6 +26,7 @@ interface EnigmeProps {
         height: number;
     }
     debug?: boolean;
+    modalImage?: string;
 }
 
 const Enigme = (props: EnigmeProps) => {
@@ -98,7 +99,7 @@ const Enigme = (props: EnigmeProps) => {
             </div>
 
             <Modal open={showInfo} title={'Info sur les travaux'} content={props.description as string}
-                   onClose={() => setShowInfo(false)}/>
+                   onClose={() => setShowInfo(false)} image={props.modalImage}/>
         </>
     );
 }

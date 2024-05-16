@@ -7,13 +7,15 @@ import Dialog from "../../components/Dialog/Dialog.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {chooseCompanion, chooseWeapon, updateScore} from "../../features/session/sessionSlice.ts";
 import {SessionState} from "../../types/Types.ts";
-import {URL} from "../../app/socket.ts";
 import Enigme from "../../components/Enigme/Enigme.tsx";
 import playSound from "../../utils/PlaySound.ts";
 import {useLocation} from "react-router-dom";
 import addScoreToSkill from "../../utils/AddScoreToSkill.ts";
-// import DevLayout from "../../components/Layout/Game/DevLayout.tsx";
-import GameLayout from "../../components/Layout/Game/GameLayout.tsx";
+import DevLayout from "../../components/Layout/Game/DevLayout.tsx";
+// import GameLayout from "../../components/Layout/Game/GameLayout.tsx";
+import selectWeapon from "../../utils/SelectWeapon.ts";
+import selectCompanion from "../../utils/SelectCompanion.ts";
+import Loader from "../../components/Loader/Loader.tsx";
 
 const GameManager = () => {
     const [loading, setLoading] = useState(true);
@@ -95,12 +97,23 @@ const GameManager = () => {
         "/videos/escape-village.mp4",
         "/videos/animated-frog.mp4",
         "/images/gardien-village.webp",
+        "/images/enter-shop.webp",
         "/videos/mountain-collapse.mp4",
         "/videos/mountain-exit-1.mp4",
         "/videos/mountain-exit-2.mp4",
         "/videos/forge.mp4",
         "/images/blacksmith.webp",
-    ]
+        "/images/realisations/borne-arcade.png",
+        "/images/realisations/pull-tinder.png",
+        "/images/realisations/livre-tinder.png",
+        "/images/realisations/affiche-2000.png",
+        "/images/realisations/affiche-dao-1.png",
+        "/images/realisations/affiche-askip.png",
+        "/images/realisations/affiche-port-cros.png",
+        "/images/realisations/affiche-dao-2.jpg",
+        "/images/realisations/affiche-apple.png",
+        "/images/realisations/lezard-real.png"
+    ];
 
     const assetsLoaded = useAssetLoader(assets);
 
@@ -206,7 +219,7 @@ const GameManager = () => {
     useEffect(() => {
         if (!location.pathname.includes("/game")) {
             return () => {
-               stopAllAudio();
+                stopAllAudio();
             };
         }
     }, [location]);
@@ -233,61 +246,39 @@ const GameManager = () => {
     };
 
     if (loading) {
-        return <div>Loading...</div>; // or a loading spinner
-    }
-
-    const selectWeapon = async (weapon: 'bague' | 'gant' | 'lunettes' | 'aucun') => {
-        const response = await fetch(`${URL}/user/weapon/choose`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + session.user_session_token
-            },
-            body: JSON.stringify({weapon: weapon}),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            dispatch(chooseWeapon({weapon: weapon}))
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    const selectCompanion = async (companion: 'jada' | 'maugy' | 'ploucou' | 'aucun') => {
-        const response = await fetch(`${URL}/user/companion/choose`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + session.user_session_token
-            },
-            body: JSON.stringify({companion: companion}),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            dispatch(chooseCompanion({companion: companion}))
-            return true;
-        } else {
-            return false;
-        }
+        return <Loader/>
     }
 
     return (
         <>
-            {/*<DevLayout sceneNumber={sceneNumber} setSceneNumber={(n: string) => setSceneNumber(n)} sceneHistory={sceneHistory} setSceneHistory={(h) => setSceneHistory(h)} stopAllAudio={stopAllAudio}/>*/}
-            <GameLayout setSceneNumber={(n: string) => setSceneNumber(n)} sceneHistory={sceneHistory} setSceneHistory={(h) => setSceneHistory(h)} stopAllAudio={stopAllAudio}/>
+            <DevLayout sceneNumber={sceneNumber} setSceneNumber={(n: string) => setSceneNumber(n)}
+                       sceneHistory={sceneHistory} setSceneHistory={(h) => setSceneHistory(h)}
+                       stopAllAudio={stopAllAudio}/>
+            {/*<GameLayout setSceneNumber={(n: string) => setSceneNumber(n)} sceneHistory={sceneHistory}*/}
+            {/*            setSceneHistory={(h) => setSceneHistory(h)} stopAllAudio={stopAllAudio}/>*/}
 
             {sceneNumber === "0.0" && (
                 <div className={"scene intro"}>
                     <video src="/videos/intro.webm" autoPlay={true} muted={false}
-                           onEnded={() => setSceneNumber("1.0")}/>
+                           onEnded={() => setSceneNumber("0.1")}/>
 
                     <div className="intro-actions">
-                        <button onClick={() => setSceneNumber("1.0")}>Passer</button>
+                        <button onClick={() => setSceneNumber("0.1")}>Passer</button>
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "0.1" && (
+                <div className={"scene"}>
+                    <div className="boutique">
+                        <img src={'/images/enter-shop.webp'} alt="background" className="background"/>
+
+                        <Dialog open={true}
+                                content={"Après cette découverte, vous décidez de préparer vos affaires et de  faire un dernier tour en ville, comme un adieu, avant de partir pour  votre longue aventure. Vous commencez votre tour par la boutique des aventuriers afin d’acheter un équipement."}
+                                showValidate={true}
+                                onValidate={() => setSceneNumber("1.0")}
+                                validateText={"Continuer l'aventure"}
+                        />
                     </div>
                 </div>
             )}
@@ -297,17 +288,29 @@ const GameManager = () => {
                     <div className="boutique">
                         <img src={'/images/page-boutique.jpg'} alt="background" className="background"/>
 
-                        <BoutiqueObjet top={0} left={0} width={15} height={40} modal={{
-                            title: "Borne d'arcade",
-                            content: "Jouez à des jeux rétro"
-                        }}/>
+                        <BoutiqueObjet
+                            top={0}
+                            left={0}
+                            width={15}
+                            height={40}
+                            modal={{
+                                title: "Borne d'arcade",
+                                content: "L'affiche présente une borne d'arcade colorée et rétro. Elle a été créée par des étudiants de première année en BUT MMI (Métiers du Multimédia et de l'Internet) dans le cadre d'une SAE (Situation d'Apprentissage et d'Évaluation). Lors de cette SAE, les étudiants ont été répartis en différentes agences fictives, chacune chargée d'organiser un événement spécifique. Pour ce groupe particulier, l'événement consistait à installer une borne d'arcade au sein de l'université. " +
+                                    "Pour cette SAE, les étudiants ont également été en charge de créer un site internet, un logo et plusieurs supports de communication, que ce soit print ou numérique.",
+                                image: "/images/realisations/borne-arcade.png"
+                            }}
+
+                        />
                         <BoutiqueObjet top={70} left={20} width={6} height={15} modal={{
-                            title: "Cadre photo",
-                            content: "Affichez vos plus beaux souvenirs"
+                            title: "Couverture d'un livre Tinder",
+                            content: "La couverture du livre « bienvenue sur la planète Tinder baby », réalisée sur Figma, a été conçue par des étudiants de troisième année en parcours communication dans le cadre d'une SAE. Cette SAE avait pour but de développer une campagne de communication et de crowdfunding pour le lancement d'un livre sur les rencontres que l’ont peu faire sur Tinder.",
+                            image: "/images/realisations/livre-tinder.png"
                         }}/>
                         <BoutiqueObjet top={12} left={82} width={9} height={22} modal={{
-                            title: "Pull tinder",
-                            content: "Trouvez l'amour"
+                            title: "Pull Tinder",
+                            content: "Le mockup de ce pull créé par des étudiants de 3ème année en parcours communication dans le cadre d'une SAE. Dans cette SAE, les étudiants avaient pour objectif de développer une campagne de communication et de crowdfunding pour le lancement d'un livre sans budget. " +
+                                "Sur le dos du pull, un QR code est imprimé, renvoyant au site permettant de commander le livre. Ce dernier regroupe des histoires courtes sur les personnes que l'on peut rencontrer sur Tinder.",
+                            image: "/images/realisations/pull-tinder.png"
                         }}/>
                         <LocationCTA top={28} left={43} width={10} height={30} onClick={() => setSceneNumber("1.0.1")}/>
                     </div>
@@ -338,7 +341,9 @@ const GameManager = () => {
                                 <Dialog open={true} title={"- Le marchand :"}
                                         content={"Vous avez déjà un objet magique. Vous ne pouvez en avoir qu'un seul. Désolé."}
                                         onClose={async () => {
-                                            if (await selectWeapon("aucun")) {
+                                            if (await selectWeapon(session, "aucun", (p) => {
+                                                dispatch(chooseWeapon(p))
+                                            })) {
                                                 setSceneNumber("1.1");
                                             }
                                         }} showClose={true} showValidate={true}
@@ -356,12 +361,17 @@ const GameManager = () => {
                                         <p>Cette bague incrustée de cristaux luminescents, octroie à son porteur le
                                             pouvoir de manipuler les objets à distance grâce à la télékinésie.</p>
                                         <button onClick={async () => {
-                                            if (await addScoreToSkill(session, "creativity", 20, (p) => {dispatch(updateScore(p))}) && await selectWeapon("bague")) {
+                                            if (await addScoreToSkill(session, "creativity", 20, (p) => {
+                                                    dispatch(updateScore(p))
+                                                }) &&
+                                                await selectWeapon(session, "bague", (p) => {
+                                                    dispatch(chooseWeapon(p))
+                                                })) {
                                                 setSceneNumber("1.2");
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
                                             }
-                                        }}>Choisir
+                                        }}>Acheter
                                         </button>
 
                                     </div>
@@ -372,12 +382,17 @@ const GameManager = () => {
                                         <p>Un gant colossal, forgé dans le métal le plus résistant, confère à son
                                             porteur une force surhumaine dans le bras qu'il équipe.</p>
                                         <button onClick={async () => {
-                                            if (await addScoreToSkill(session, "development", 20, (p) => {dispatch(updateScore(p))}) && await selectWeapon("gant")) {
+                                            if (await addScoreToSkill(session, "development", 20, (p) => {
+                                                    dispatch(updateScore(p))
+                                                }) &&
+                                                await selectWeapon(session, "gant", (p) => {
+                                                    dispatch(chooseWeapon(p))
+                                                })) {
                                                 setSceneNumber("1.2");
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
                                             }
-                                        }}>Choisir
+                                        }}>Acheter
                                         </button>
                                     </div>
 
@@ -387,12 +402,17 @@ const GameManager = () => {
                                         <p>Ces lunettes sinistres, confèrent à leur porteur un pouvoir de contrôle
                                             mental redoutable.</p>
                                         <button onClick={async () => {
-                                            if (await addScoreToSkill(session, "marketing", 20, (p) => {dispatch(updateScore(p))}) && await selectWeapon("lunettes")) {
+                                            if (await addScoreToSkill(session, "marketing", 20, (p) => {
+                                                    dispatch(updateScore(p))
+                                                }) &&
+                                                await selectWeapon(session, "lunettes", (p) => {
+                                                    dispatch(chooseWeapon(p))
+                                                })) {
                                                 setSceneNumber("1.2");
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
                                             }
-                                        }}>Choisir
+                                        }}>Acheter
                                         </button>
                                     </div>
                                 </div>
@@ -412,7 +432,9 @@ const GameManager = () => {
                             <Dialog open={true} title={"- Le marchand :"}
                                     content={"Vous avez déjà un compagnon. Vous ne pouvez en avoir qu'un seul. Désolé."}
                                     onClose={async () => {
-                                        if (await selectCompanion("aucun")) {
+                                        if (await selectCompanion(session, "aucun", (p) => {
+                                            dispatch(chooseCompanion(p))
+                                        })) {
                                             setSceneNumber("1.2");
                                         }
                                     }} showValidate={true} showClose={true}
@@ -429,7 +451,12 @@ const GameManager = () => {
                                     <h3>JADA</h3>
                                     <p>Jada est un Kiblun dynamique, agile et intelligent, logique et curieux.</p>
                                     <button onClick={async () => {
-                                        if (await addScoreToSkill(session,"development", 20, (p) => {dispatch(updateScore(p))}) && await selectCompanion("jada")) {
+                                        if (await addScoreToSkill(session, "development", 20, (p) => {
+                                                dispatch(updateScore(p))
+                                            }) &&
+                                            await selectCompanion(session, "jada", (p) => {
+                                                dispatch(chooseCompanion(p))
+                                            })) {
                                             setSceneNumber("1.3");
                                         } else {
                                             alert("Une erreur est survenue. Veuillez réessayer.");
@@ -444,7 +471,12 @@ const GameManager = () => {
                                     <p>Maugy est un Kiblun doté d'un esprit créatif et d'une grande ouverture d'esprit.
                                         Il apporte une touche de magie et de fantaisie.</p>
                                     <button onClick={async () => {
-                                        if (await addScoreToSkill(session, "creativity", 20, (p) => {dispatch(updateScore(p))}) && await selectCompanion("maugy")) {
+                                        if (await addScoreToSkill(session, "creativity", 20, (p) => {
+                                                dispatch(updateScore(p))
+                                            }) &&
+                                            await selectCompanion(session, "maugy", (p) => {
+                                                dispatch(chooseCompanion(p))
+                                            })) {
                                             setSceneNumber("1.3");
                                         } else {
                                             alert("Une erreur est survenue. Veuillez réessayer.");
@@ -459,7 +491,12 @@ const GameManager = () => {
                                     <p>Ploucou est un petit Kiblun fin stratege doté d’une forte capacité d’analyse et
                                         très sociable.</p>
                                     <button onClick={async () => {
-                                        if (await addScoreToSkill(session, "marketing", 20, (p) => {dispatch(updateScore(p))}) && await selectCompanion("ploucou")) {
+                                        if (await addScoreToSkill(session, "marketing", 20, (p) => {
+                                                dispatch(updateScore(p))
+                                            }) &&
+                                            await selectCompanion(session, "ploucou", (p) => {
+                                                dispatch(chooseCompanion(p))
+                                            })) {
                                             setSceneNumber("1.3");
                                         } else {
                                             alert("Une erreur est survenue. Veuillez réessayer.");
@@ -501,27 +538,33 @@ const GameManager = () => {
 
                         <BoutiqueObjet top={20} left={12} width={6} height={14} modal={{
                             title: "Summer Stars 2000",
-                            content: "Une affiche du tonnerre !"
+                            content: "Cette affiche a été créée sur InDesign par un étudiant en MMI, spécialisé en création numérique. Le projet consistait à choisir une époque et un type de musique, puis à concevoir des supports de communication en rapport avec ces choix. L'étudiant a choisi les années 2000 avec le thème pop. ",
+                            image: "/images/realisations/affiche-2000.png"
                         }}/>
                         <BoutiqueObjet top={19} left={31} width={4} height={14} modal={{
-                            title: "iPhone ?",
-                            content: "Un téléphone portable"
+                            title: "Danse à l'opéra",
+                            content: "J'ai élaboré une affiche pour l'événement \"2024 Danse à l'Opéra\" pour le lycée Dumont d'Urville. Cette année, l'événement s'est inspiré des Jeux Olympiques, associant des éléments modernes à des références emblématiques de l'Antiquité. L’étudiant a opté pour un design équilibré mettant en avant le titre de l'événement ainsi que les détails essentiels tels que la date, l'heure et le lieu. Des visuels dynamiques, tels que des danseurs en mouvement, apportent du dynamisme à l'affiche.",
+                            image: "/images/realisations/affiche-dao-1.png"
                         }}/>
                         <BoutiqueObjet top={18} left={35} width={5} height={14} modal={{
-                            title: "Evenement",
-                            content: "Un événement à ne pas rater"
+                            title: "Affiche ASKIP",
+                            content: "Cette affiche a été créée par des étudiants de première année dans le cadre d’une SAE. Les étudiants ont été répartis en différentes agences fictives, chacune chargée d'organiser un événement spécifique. Pour ce groupe, l'événement était une vente aux enchères de NFT au sein de l'université. Les étudiants ont également conçu un site internet, un logo et divers supports de communication, tant imprimés que numériques.",
+                            image: "/images/realisations/affiche-askip.png"
                         }}/>
                         <BoutiqueObjet top={16} left={40} width={5} height={14} modal={{
-                            title: "ile de Porquerolles",
-                            content: "une île paradisiaque"
+                            title: "Affiche Port Cros",
+                            content: "Cette affiche a été réalisée par un étudiant en troisième année de parcours création numérique dans le cadre d'une SAE. L'objectif du projet était de mettre en avant la faune et la flore du parc national de Port Cros. Les étudiants ont également conçu un web documentaire interactif, incluant une visite à 360° du lieu et des fonds marins, ainsi que des interviews de personnes travaillant dans le parc national.",
+                            image: "/images/realisations/affiche-port-cros.png"
                         }}/>
                         <BoutiqueObjet top={14} left={46} width={6} height={16} modal={{
-                            title: "Danse à l'opéra",
-                            content: "Plus vite, plus haut, plus fort, ENSEMBLE!"
+                            title: "Danse à l'opéra 2",
+                            content: "J'ai conçu une affiche pour le lycée Dumont d'Urville pour l'événement \"2024 Danse à l'Opéra\". Cette année, l'événement s'inspire des Jeux Olympiques en mêlant des éléments modernes à des références emblématiques de l'Antiquité. Mon design met l'accent sur le titre de l'événement ainsi que sur les informations essentielles telles que la date, l'heure et le lieu, dans une mise en page équilibrée. Des images dynamiques, représentant des danseurs en mouvement, ajoutent de l'énergie à l'affiche.",
+                            image: "/images/realisations/affiche-dao-2.jpg"
                         }}/>
                         <BoutiqueObjet top={0} left={56} width={10} height={17} modal={{
-                            title: "Danse à l'opéra 2",
-                            content: "Plus vite, plus haut, plus fort, ENSEMBLE!"
+                            title: "Apple",
+                            content: "Un étudiant en troisième année de MMI, spécialisé en création numérique, a créé une campagne publicitaire décalée pour Apple, rompant avec le style habituel de la marque. L’étudiant a conçu deux affiches humoristiques, dont l'une légèrement provocatrice, mettant en avant l'élégance de la marque tout en y ajoutant une touche d'humour. Cette approche audacieuse vise à susciter l'intérêt et à engager le spectateur d'une manière nouvelle et inattendue, explorant de nouveaux horizons créatifs tout en restant fidèle à l'essence même d'Apple.",
+                            image: "/images/realisations/affiche-apple.png"
                         }}/>
                         <LocationCTA top={37} left={33} width={10} height={20} onClick={() => {
                             // BARMAN BEGIN SCENE 2.1
@@ -588,7 +631,9 @@ const GameManager = () => {
                             type={"text"}
                             onValidate={async (response) => {
                                 if (response === "print") {
-                                    if (await addScoreToSkill(session, "development", 10, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "development", 10, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("2.2.1.1");
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -609,7 +654,9 @@ const GameManager = () => {
                         <Dialog open={true} title={"- Le barman :"}
                                 content={"Bravo ! Tu as réussi l'épreuve de bon-sens. Tu as gagné 10 points en développement."}
                                 onClose={async () => {
-                                    if (await addScoreToSkill(session, "development", 10, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "development", 10, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("2.3");
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -672,7 +719,9 @@ const GameManager = () => {
                             onValidate={async (response) => {
                                 console.log(response)
                                 if (response === "correct") {
-                                    if (await addScoreToSkill(session, "creativity", 10, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "creativity", 10, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("2.2.2.1")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -700,7 +749,9 @@ const GameManager = () => {
                         <Dialog open={true} title={"- Le barman :"}
                                 content={"Bravo ! Tu as réussi l'épreuve de créativité. Tu as gagné 10 points en création numérique."}
                                 onClose={async () => {
-                                    if (await addScoreToSkill(session, "creativity", 10, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "creativity", 10, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("2.3");
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -723,6 +774,7 @@ const GameManager = () => {
                                 "Pour réaliser une communication efficace d’un festival de musique, quel support est le plus adapté à être affiché en grand (ville, arrêt de bus, entrée du festival...) ?"
                             }
                             description={"Ces supports de communication imprimés ont été créés sur Illustrator par deux étudiants en MMI, spécialisés en création numérique. Le projet consistait à choisir une époque et un type de musique, puis à concevoir des supports de communication en rapport avec ces choix. Les étudiants ont opté pour les années 70 avec le thème disco."}
+                            modalImage={"/images/epreuve_com/epreuve_com_img1.jpeg"}
                             answer={"1"}
                             type={"image-choice"}
                             images={[{
@@ -739,7 +791,9 @@ const GameManager = () => {
                             onValidate={async (response) => {
                                 console.log(response)
                                 if (response === "correct") {
-                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("2.2.3.1");
                                     }
                                 } else {
@@ -761,7 +815,9 @@ const GameManager = () => {
                         <Dialog open={true} title={"- Le barman :"}
                                 content={"Bravo ! Tu as réussi l'épreuve de social. Tu as gagné 10 points en marketing."}
                                 onClose={async () => {
-                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("2.3");
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -812,6 +868,18 @@ const GameManager = () => {
                     <div className="boutique">
                         <video src="/videos/meet-lezard.mp4" className={"background"} autoPlay={true} muted={false}/>
 
+                        <BoutiqueObjet
+                            top={40}
+                            left={40}
+                            width={30}
+                            height={30}
+                            modal={{
+                                title: "Lézard 3D",
+                                content: "Ce lézard est inspiré d’une création 3D réalisée par une étudiante en deuxième année de parcours création numérique. Le projet, mené en collaboration avec le Lycée Dumont d'Urville, consistait à créer un environnement inspiré du film « Au centre de la Terre ». La grotte en 3D et le lézard ont été projetés en arrière-plan lors du spectacle de fin d’année des danseurs du lycée.",
+                                image: "/images/realisations/lezard-real.png"
+                            }}
+                        />
+
                         <Dialog open={true}
                                 content={"Et comme rien ne se passe jamais comme prévu, un lézard vous bloque l’entrée à la foret ! Il n’a pas l’air sauvage mais n’a pas l’air bienveillant non plus... Vous avez vraiment besoin d’aller dans cette foret !"}
                                 showClose={true} showValidate={true}
@@ -820,7 +888,9 @@ const GameManager = () => {
                                     playSound("/sounds/voice-death-lezard.wav", false);
                                 }}
                                 onValidate={async () => {
-                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("3.1.2")
                                     }
                                 }}
@@ -864,7 +934,9 @@ const GameManager = () => {
                                     {
                                         text: "Ta voix",
                                         onClick: async () => {
-                                            if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
+                                            if (await addScoreToSkill(session, "marketing", 10, (p) => {
+                                                dispatch(updateScore(p))
+                                            })) {
                                                 setSceneNumber("3.2.3")
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -874,7 +946,9 @@ const GameManager = () => {
                                     {
                                         text: "Ta main dominante",
                                         onClick: async () => {
-                                            if (await addScoreToSkill(session, "creativity", 10, (p) => {dispatch(updateScore(p))})) {
+                                            if (await addScoreToSkill(session, "creativity", 10, (p) => {
+                                                dispatch(updateScore(p))
+                                            })) {
                                                 setSceneNumber("3.2.2")
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -884,7 +958,9 @@ const GameManager = () => {
                                     {
                                         text: "Ta mémoire",
                                         onClick: async () => {
-                                            if (await addScoreToSkill(session, "development", 10, (p) => {dispatch(updateScore(p))})) {
+                                            if (await addScoreToSkill(session, "development", 10, (p) => {
+                                                dispatch(updateScore(p))
+                                            })) {
                                                 setSceneNumber("3.2.1")
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -910,7 +986,9 @@ const GameManager = () => {
                         answer={"andré"}
                         onValidate={async (answer) => {
                             if (answer.toLowerCase() === "andré") {
-                                if (await addScoreToSkill(session, "development", 20, (p) => {dispatch(updateScore(p))})) {
+                                if (await addScoreToSkill(session, "development", 20, (p) => {
+                                    dispatch(updateScore(p))
+                                })) {
                                     setSceneNumber("3.3")
                                 } else {
                                     alert("Une erreur est survenue. Veuillez réessayer.");
@@ -947,7 +1025,9 @@ const GameManager = () => {
                             }]}
                             onValidate={async (answer) => {
                                 if (answer.toLowerCase() === "correct") {
-                                    if (await addScoreToSkill(session, "creativity", 20, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "creativity", 20, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("3.3")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -986,7 +1066,9 @@ const GameManager = () => {
                             }]}
                             onValidate={async (answer) => {
                                 if (answer.toLowerCase() === "correct") {
-                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "marketing", 10, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("3.3")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1051,8 +1133,9 @@ const GameManager = () => {
                             width={15}
                             height={10}
                             modal={{
-                                title: "PROV'ANSE",
-                                content: "La conception de ce logo a été réalisée en septembre 2023 dans le cadre d’un projet fictif pour mon cours de marketing. L’objectif était de concevoir une marque locale de vêtements tout en intégrant ses objectifs marketing. Nous avons choisi de créer des t-shirts mettant en avant les villes de la région PACA. Ainsi, nous avons nommé notre marque « Prov’anse », pour mettre en avant la Provence et son lien avec la Méditerranée."
+                                title: "Logo PROV'ANSE",
+                                content: "La conception de ce logo a été réalisée en septembre 2023 dans le cadre d’un projet fictif pour mon cours de marketing. L’objectif était de concevoir une marque locale de vêtements tout en intégrant ses objectifs marketing. Nous avons choisi de créer des t-shirts mettant en avant les villes de la région PACA. Ainsi, nous avons nommé notre marque « Prov’anse », pour mettre en avant la Provence et son lien avec la Méditerranée.",
+                                image: "/images/realisations/provanse.png"
                             }}
                         />
 
@@ -1062,8 +1145,9 @@ const GameManager = () => {
                             width={10}
                             height={10}
                             modal={{
-                                title: "BURGER",
-                                content: "Ces maquettes de sites UX ont été réalisées par des étudiants en deuxième année de MMI. Le projet consistait à développer un site fonctionnel permettant de personnaliser sa commande et certains aliments."
+                                title: "Site Livraison nourriture",
+                                content: "Ces maquettes de sites UX ont été réalisées par des étudiants en deuxième année de MMI. Le projet consistait à développer un site fonctionnel permettant de personnaliser sa commande et certains aliments.",
+                                image: "/images/realisations/sites-nourriture.png"
                             }}
                         />
 
@@ -1073,8 +1157,9 @@ const GameManager = () => {
                             width={10}
                             height={23}
                             modal={{
-                                title: "GROTTE",
-                                content: "Cette grotte a été modélisée en 3D par des étudiants en deuxième année, parcours création numérique. Le projet consistait à créer un environnement inspiré du film « Au centre de la Terre ». La grotte en 3D a été projetée en arrière-plan lors du spectacle de fin d’année des danseurs du Lycée Dumont d’Urville."
+                                title: "GROTTE 3D",
+                                content: "Cette grotte a été modélisée en 3D par des étudiants en deuxième année, parcours création numérique. Le projet consistait à créer un environnement inspiré du film « Au centre de la Terre ». La grotte en 3D a été projetée en arrière-plan lors du spectacle de fin d’année des danseurs du Lycée Dumont d’Urville.",
+                                video: "/images/realisations/video-grotte.mp4"
                             }}
                         />
 
@@ -1084,8 +1169,9 @@ const GameManager = () => {
                             width={45}
                             height={40}
                             modal={{
-                                title: "LAC",
-                                content: "Cette visite virtuelle sous-marine de Port-Cros a été réalisée par deux étudiants en troisième année de MMI, parcours création numérique, lors d’un projet visant à découvrir le parc naturel et sensibiliser à la préservation de l’environnement."
+                                title: "Visite virtuelle sous-marine",
+                                content: "Cette visite virtuelle sous-marine de Port-Cros a été réalisée par deux étudiants en troisième année de MMI, parcours création numérique, lors d’un projet visant à découvrir le parc naturel et sensibiliser à la préservation de l’environnement.",
+                                image: "/images/realisations/vr-lac.png"
                             }}
                         />
                     </div>
@@ -1124,7 +1210,9 @@ const GameManager = () => {
                                     answer: "avance",
                                     onValidate: async (answer) => {
                                         if (answer.toLowerCase() === "avance" || answer.toLowerCase() === "j'avance" || answer.toLowerCase() === "avancer") {
-                                            if (await addScoreToSkill(session, "marketing", 10, (p) => {dispatch(updateScore(p))})) {
+                                            if (await addScoreToSkill(session, "marketing", 10, (p) => {
+                                                dispatch(updateScore(p))
+                                            })) {
                                                 setSceneNumber("4.1.2")
                                             } else {
                                                 alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1206,7 +1294,9 @@ const GameManager = () => {
                             answer={"attention aux gaz toxiques"}
                             onValidate={async (answer) => {
                                 if (answer.toLowerCase() === "attention aux gaz toxiques") {
-                                    if (await addScoreToSkill(session, "development", 30, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "development", 30, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("4.4")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1329,7 +1419,9 @@ const GameManager = () => {
                             }}
                             onValidate={async (answer) => {
                                 if (answer.toLowerCase() === "correct") {
-                                    if (await addScoreToSkill(session, "creativity", 30, (p) => {dispatch(updateScore(p))})) {
+                                    if (await addScoreToSkill(session, "creativity", 30, (p) => {
+                                        dispatch(updateScore(p))
+                                    })) {
                                         setSceneNumber("5.0")
                                     } else {
                                         alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1382,7 +1474,9 @@ const GameManager = () => {
                             height={40}
                             modal={{
                                 title: "Low Poly",
-                                content: "Ce low poly a été réalisé par un étudiant en première année. Le projet avait pour but d'apprendre aux étudiants à utiliser Illustrator. Ils devaient se représenter en utilisant de nombreux triangles. Le low poly devait reproduire au mieux l’image choisie au départ."
+                                content: "Ce low poly a été réalisé par un étudiant en première année. Le projet avait pour but d'apprendre aux étudiants à utiliser Illustrator. Ils devaient se représenter en utilisant de nombreux triangles. Le low poly devait reproduire au mieux l’image choisie au départ.",
+                                image: "/images/realisations/lowpoly.png",
+                                orientation: "column"
                             }}
                         />
                         <BoutiqueObjet
@@ -1392,7 +1486,9 @@ const GameManager = () => {
                             height={20}
                             modal={{
                                 title: "Court-métrage",
-                                content: "Dans le cadre d'un projet universitaire, nous avons dû réaliser un court métrage sur le thème du feu. Notre film, intitulé \"Le Grand Froid\", suit l'histoire de Bruno, un jeune aventurier pris au piège dans une tempête de neige. Malgré les obstacles logistiques et météorologiques, nous avons su filmer, monter et produire ce court métrage, démontrant ainsi notre passion et notre compétence dans le domaine de l'audiovisuel."
+                                content: "Dans le cadre d'un projet universitaire, nous avons dû réaliser un court métrage sur le thème du feu. Notre film, intitulé \"Le Grand Froid\", suit l'histoire de Bruno, un jeune aventurier pris au piège dans une tempête de neige. Malgré les obstacles logistiques et météorologiques, nous avons su filmer, monter et produire ce court métrage, démontrant ainsi notre passion et notre compétence dans le domaine de l'audiovisuel.",
+                                image: "/images/realisations/grand-froid.jpg",
+                                orientation: "column"
                             }}
                         />
 
@@ -1421,7 +1517,9 @@ const GameManager = () => {
                             width={13}
                             height={15}
                             onClick={async () => {
-                                if (await addScoreToSkill(session, "development", 20, (p) => {dispatch(updateScore(p))})) {
+                                if (await addScoreToSkill(session, "development", 20, (p) => {
+                                    dispatch(updateScore(p))
+                                })) {
                                     setSceneNumber("5.2.1")
                                 } else {
                                     alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1438,7 +1536,9 @@ const GameManager = () => {
                             height={15}
                             onClick={async () => {
                                 console.log("CREA")
-                                if (await addScoreToSkill(session, "creativity", 20, (p) => {dispatch(updateScore(p))})) {
+                                if (await addScoreToSkill(session, "creativity", 20, (p) => {
+                                    dispatch(updateScore(p))
+                                })) {
                                     setSceneNumber("5.2.1")
                                 } else {
                                     alert("Une erreur est survenue. Veuillez réessayer.");
@@ -1454,7 +1554,9 @@ const GameManager = () => {
                             width={13}
                             height={15}
                             onClick={async () => {
-                                if (await addScoreToSkill(session, "marketing", 20, (p) => {dispatch(updateScore(p))})) {
+                                if (await addScoreToSkill(session, "marketing", 20, (p) => {
+                                    dispatch(updateScore(p))
+                                })) {
                                     setSceneNumber("5.2.2")
                                 } else {
                                     alert("Une erreur est survenue. Veuillez réessayer.");

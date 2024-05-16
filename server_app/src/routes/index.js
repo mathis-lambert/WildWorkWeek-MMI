@@ -228,5 +228,4 @@ router.post("/user/companion/choose", async function (req, res) {
     }
 });
 
-
 module.exports = router;

@@ -8,7 +8,9 @@ interface ModalProps {
     showClose?: boolean;
     onValidate?: () => void;
     showValidate?: boolean;
-
+    image?: string;
+    video?: string;
+    orientation?: "row" | "column";
 }
 
 const Modal = (props: ModalProps) => {
@@ -16,7 +18,16 @@ const Modal = (props: ModalProps) => {
         <div className={`modal ${props.open ? "open" : ""}`} onClick={() => props.onClose()}>
             <div className="modal-content">
                 <h2>{props.title}</h2>
-                <p>{props.content}</p>
+                <div className={`modal-body ${props.orientation || "row"}`}>
+                    <div className="modal-description">
+                        <p>{props.content}</p>
+                    </div>
+                    <div className="modal-image">
+                        {props.image && <img src={props.image} alt=""/>}
+                        {props.video && <video src={props.video} autoPlay loop muted/>}
+                    </div>
+                </div>
+
                 {props.showClose && <button onClick={props.onClose}>Fermer</button>}
                 {props.showValidate && <button onClick={props.onValidate}>Je valide !</button>}
             </div>
