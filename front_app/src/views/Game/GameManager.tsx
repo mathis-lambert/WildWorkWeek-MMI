@@ -11,11 +11,13 @@ import Enigme from "../../components/Enigme/Enigme.tsx";
 import playSound from "../../utils/PlaySound.ts";
 import {useLocation} from "react-router-dom";
 import addScoreToSkill from "../../utils/AddScoreToSkill.ts";
-import DevLayout from "../../components/Layout/Game/DevLayout.tsx";
-// import GameLayout from "../../components/Layout/Game/GameLayout.tsx";
+// import DevLayout from "../../components/Layout/Game/DevLayout.tsx";
+import GameLayout from "../../components/Layout/Game/GameLayout.tsx";
 import selectWeapon from "../../utils/SelectWeapon.ts";
 import selectCompanion from "../../utils/SelectCompanion.ts";
 import Loader from "../../components/Loader/Loader.tsx";
+import {useNavigate} from "react-router-dom";
+import {getHsl} from "../../utils/ColorsUtils.ts";
 
 const GameManager = () => {
     const [loading, setLoading] = useState(true);
@@ -29,6 +31,7 @@ const GameManager = () => {
     const [mountainSoundPlaying, setMountainSoundPlaying] = useState(false)
     const [forgeSoundPlaying, setForgeSoundPlaying] = useState(false)
     const [avanceSoundPlaying, setAvanceSoundPlaying] = useState(false)
+    const [revealSoundPlaying, setRevealSoundPlaying] = useState(false)
     const [mountainCount, setMountainCount] = useState(15)
 
     const boutiqueAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -38,9 +41,13 @@ const GameManager = () => {
     const avanceAudioRef = useRef<HTMLAudioElement | null>(null);
     const mountainAudioRef = useRef<HTMLAudioElement | null>(null);
     const forgeAudioRef = useRef<HTMLAudioElement | null>(null);
+    const revealAudioRef = useRef<HTMLAudioElement | null>(null);
+
+    const [hsl, setHsl] = useState([0, 0, 0]);
 
 
     const session: SessionState["session"] = useSelector((state: SessionState) => state.session);
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const assets = [
@@ -94,6 +101,7 @@ const GameManager = () => {
         "/sounds/mountain-music.mp3",
         "/sounds/collapsing.mp3",
         "/sounds/forge-music.mp3",
+        "/sounds/reveal-music.mp3",
         "/videos/escape-village.mp4",
         "/videos/animated-frog.mp4",
         "/images/gardien-village.webp",
@@ -178,6 +186,15 @@ const GameManager = () => {
                 setForgeSoundPlaying(false);
             }
 
+            if (sceneNumber.match(/^7(\.[0-9]+)+$/) && !revealSoundPlaying) {
+                revealAudioRef.current = playSound("/sounds/reveal-music.mp3", true);
+                setRevealSoundPlaying(true);
+            } else if (revealSoundPlaying && !sceneNumber.match(/^7(\.[0-9]+)+$/)) {
+                revealAudioRef.current?.pause();
+                setRevealSoundPlaying(false);
+            }
+
+
             if (sceneNumber === "3.2.1") {
                 console.log("%cBravo ! tu as eu l'idée d'ouvrir la console de développement", "color: red; font-size: 20px;");
                 console.log("%cTu as gagné 10 points en développement", "color: red; font-size: 20px;");
@@ -232,6 +249,7 @@ const GameManager = () => {
         mountainAudioRef.current?.pause();
         forgeAudioRef.current?.pause();
         avanceAudioRef.current?.pause();
+        revealAudioRef.current?.pause();
     }
 
     useEffect(() => {
@@ -239,6 +257,10 @@ const GameManager = () => {
             setSceneNumber("5.0");
         }
     }, [mountainCount]);
+
+    useEffect(() => {
+        setHsl(getHsl(session));
+    }, [session]);
 
 
     const loadGame = () => {
@@ -251,11 +273,11 @@ const GameManager = () => {
 
     return (
         <>
-            <DevLayout sceneNumber={sceneNumber} setSceneNumber={(n: string) => setSceneNumber(n)}
-                       sceneHistory={sceneHistory} setSceneHistory={(h) => setSceneHistory(h)}
-                       stopAllAudio={stopAllAudio}/>
-            {/*<GameLayout setSceneNumber={(n: string) => setSceneNumber(n)} sceneHistory={sceneHistory}*/}
-            {/*            setSceneHistory={(h) => setSceneHistory(h)} stopAllAudio={stopAllAudio}/>*/}
+            {/*<DevLayout sceneNumber={sceneNumber} setSceneNumber={(n: string) => setSceneNumber(n)}*/}
+            {/*           sceneHistory={sceneHistory} setSceneHistory={(h) => setSceneHistory(h)}*/}
+            {/*           stopAllAudio={stopAllAudio}/>*/}
+            <GameLayout setSceneNumber={(n: string) => setSceneNumber(n)} sceneHistory={sceneHistory}
+                        setSceneHistory={(h) => setSceneHistory(h)} stopAllAudio={stopAllAudio}/>
 
             {sceneNumber === "0.0" && (
                 <div className={"scene intro"}>
@@ -1628,8 +1650,31 @@ const GameManager = () => {
                         <Dialog open={true}
                                 content={"Il est maintenant temps pour vous d’utiliser toute votre expériences et vos aventures !"}
                                 showClose={false} showValidate={true}
-                                onValidate={() => setSceneNumber("6.0")}
+                                onValidate={() => setSceneNumber("7.0")}
                                 validateText={"Continuer"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {sceneNumber === "7.0" && (
+                <div className="scene release">
+                    <div className="boutique">
+                        <img src="/images/crystal-hand.png" className={"background"} alt="artefact"/>
+
+                        <div className={"artefact"}>
+                            <img src="/images/artefact/base.png" alt="artefact"
+                            style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(100%)`}}/>
+                        </div>
+
+                        <Dialog open={true}
+                                content={"Vous avez réussi à forger votre Artefact Magique. Il est unique et vous permettra de réaliser vos rêves les plus fous. Félicitations !"}
+                                showClose={false} showValidate={true}
+                                onValidate={() => {
+                                    stopAllAudio()
+                                    navigate("/")
+                                }}
+                                validateText={"Terminer l'aventure"}
                         />
                     </div>
                 </div>

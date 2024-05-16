@@ -3,7 +3,7 @@ import './Artefact.scss';
 import React, {useEffect, useState} from "react";
 import {getHsl} from "../../utils/ColorsUtils.ts";
 import {useSelector} from "react-redux";
-import {SessionState} from "../../types/Types.ts";
+import {SessionState, Skill} from "../../types/Types.ts";
 
 const Artefact = () => {
     const session = useSelector((state: SessionState) => state.session);
@@ -20,6 +20,12 @@ const Artefact = () => {
         target.style.filter = ``;
     };
 
+    const getPercentage = (skill: Skill) => {
+        const sum = session.user_score.development + session.user_score.creativity + session.user_score.marketing;
+        if (sum === 0) return 0;
+        return Math.round((session.user_score[skill] / sum) * 100);
+    }
+
     useEffect(() => {
         setHsl(getHsl(session));
     }, [session]);
@@ -28,20 +34,40 @@ const Artefact = () => {
         <div className={"artefact"}>
             <div className="artefact-scroll">
                 <h1 className={"artefact-title"}>Mon artefact magique</h1>
+                <p className={"artefact-subtitle"}>Dominance :
+                    {session.user_score.development > session.user_score.creativity && session.user_score.development > session.user_score.marketing ? " Développement web" : ""}
+                    {session.user_score.creativity > session.user_score.development && session.user_score.creativity > session.user_score.marketing ? " Création numérique" : ""}
+                    {session.user_score.marketing > session.user_score.development && session.user_score.marketing > session.user_score.creativity ? " Stratégie de communication" : ""}
+                </p>
                 <div className="artefact-picture" onMouseOver={handleMouseOver}
                      onMouseOut={handleMouseOut}>
-                    <img src="/images/artefact/base.png" alt="artefact" style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(${hsl[2]}%)`}}/>
+                    <img src="/images/artefact/base.png" alt="artefact"
+                         style={{filter: `hue-rotate(${hsl[0]}deg) saturate(${hsl[1]}%) brightness(90%)`}}/>
                 </div>
                 <div className="artefact-description">
-                    <p>Mon artefact est un artefact magique qui me permet de réaliser des projets incroyables. Il est
-                        composé de plusieurs parties, chacune représentant une compétence que je maîtrise.</p>
-                    <p>Il est composé de :</p>
-                    <ul>
-                        <li>La partie développement, qui me permet de réaliser des applications web et mobiles.</li>
-                        <li>La partie design, qui me permet de réaliser des interfaces graphiques et des maquettes.</li>
-                        <li>La partie data, qui me permet de réaliser des analyses de données et des visualisations.
-                        </li>
-                    </ul>
+                    <div className="score">
+                        <div className="skill dev">
+                            <p>Développement</p>
+                            <div className="progress">
+                                <div className="progress-bar dev" style={{width: getPercentage("development") + "%"}}/>
+                            </div>
+                        </div>
+                        <div className="skill crea">
+                            <p>Créativité</p>
+                            <div className="progress">
+                                <div className="progress-bar crea" style={{width: getPercentage("creativity") + "%"}}/>
+                            </div>
+                        </div>
+                        <div className="skill mark">
+                            <p>Communication</p>
+                            <div className="progress">
+                                <div className="progress-bar mark" style={{width: getPercentage("marketing") + "%"}}/>
+                            </div>
+                        </div>
+                    </div>
+                    <p>Voici votre artefact magique, il est composé de trois cristaux qui représentent vos compétences
+                        en développement, en créativité et en marketing. Plus vous avez de compétences dans un domaine,
+                        plus le cristal associé est grand et brillant.</p>
                 </div>
             </div>
         </div>

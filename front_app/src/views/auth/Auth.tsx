@@ -4,6 +4,7 @@ import {URL} from "../../app/socket.ts";
 import sha256 from "../../utils/sha256";
 import {useDispatch} from "react-redux";
 import {signIn} from "../../features/session/sessionSlice.ts";
+import "./Auth.scss";
 
 
 const Auth = () => {
@@ -75,9 +76,11 @@ const Auth = () => {
 
     return (
         <div>
-            <h1>Auth</h1>
             {register && (
-                <div>
+                <div className="register">
+                    <div className="artefact">
+                        <img src="/images/artefact/main.png" alt="artefact"/>
+                    </div>
                     <h2>Register</h2>
                     <Form
                         fields={[
@@ -115,16 +118,22 @@ const Auth = () => {
                         onSubmit={handleRegister}
                     />
 
-                    <p>Vous avez déjà un compte ? <button onClick={() => {
-                        setRegister(false);
-                        setLogin(true);
-                    }}>Se connecter</button></p>
-
+                    <div className="options">
+                        <p>Vous avez déjà un compte ? </p>
+                        <button onClick={() => {
+                            setRegister(false);
+                            setLogin(true);
+                        }}>Se connecter
+                        </button>
+                    </div>
                 </div>
             )}
 
             {login && (
-                <div>
+                <div className="login">
+                    <div className="artefact">
+                        <img src="/images/artefact/main.png" alt="artefact"/>
+                    </div>
                     <h2>Login</h2>
                     <Form
                         fields={[
@@ -148,10 +157,15 @@ const Auth = () => {
                         onSubmit={handleLogin}
                     />
 
-                    <p>Vous n'avez pas de compte ? <button onClick={() => {
-                        setRegister(true);
-                        setLogin(false);
-                    }}>S'enregistrer</button></p>
+                    <div className="options">
+                        <p>Vous n'avez pas de compte ? </p>
+                        <button onClick={() => {
+                            setRegister(true);
+                            setLogin(false);
+                        }}>S'enregistrer
+                        </button>
+                    </div>
+
                 </div>
             )}
             <p>{error}</p>

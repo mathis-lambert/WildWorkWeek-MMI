@@ -9,6 +9,8 @@ import {SessionState} from "./types/Types.ts";
 import Auth from "./views/auth/Auth.tsx";
 import Layout from "./components/Layout/Main/Layout.tsx";
 import GameManager from "./views/Game/GameManager.tsx";
+import Loader from "./components/Loader/Loader.tsx";
+import MMI from "./views/MMI/MMI.tsx";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -23,7 +25,7 @@ function App() {
 
             const timeout = setTimeout(() => {
                 setLoading(false);
-            }, 1000);
+            }, 300);
 
             return () => {
                 clearTimeout(timeout);
@@ -68,18 +70,16 @@ function App() {
     return (
         <>
             {loading && (
-                <div className="loading">
-                    <div className="loading__spinner"/>
-                    <h1 className="loading__text">Loading...</h1>
-                </div>
-            )
-            }
+                <>
+                    <Loader/>
+                </>
+            )}
 
             {!loading && session.isSignedIn && (
                 <Routes>
                     <Route element={<Layout/>}>
                         <Route path="/" element={<Home/>}/>
-                        <Route path="/mmi" element={<h1>MMI</h1>}/>
+                        <Route path="/mmi" element={<MMI/>}/>
                         <Route path="/projects" element={<h1>Projets</h1>}/>
                     </Route>
 

@@ -18,10 +18,43 @@
 
   }
 
+  &.release {
+    .artefact {
+      position: absolute;
+      top: 15%;
+      left: 35%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: all;
+
+      img {
+        width: 300px;
+        height: 300px;
+        object-fit: contain;
+        transition: transform 300ms;
+        user-select: none;
+
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+
+        &:hover {
+            animation: bounce 3s infinite ease-in-out;
+        }
+      }
+    }
+  }
+
   &.intro, &.forest-2 {
     .intro-actions, .forest-actions {
       position: absolute;
-        bottom: 1rem;
+      bottom: 1rem;
 
       button {
         font-family: 'MedievalSharp', cursive;
@@ -39,7 +72,7 @@
 
     .intro-actions {
       left: 50%;
-        transform: translateX(-50%);
+      transform: translateX(-50%);
     }
 
     .forest-actions {
@@ -154,7 +187,7 @@
       font-size: 1.25rem;
       color: #fff;
       // 2 lines
-        text-align: center;
+      text-align: center;
     }
 
     p {
@@ -162,19 +195,19 @@
       font-size: 0.75rem;
       color: #fff;
       // 2 lines
-        text-align: center;
+      text-align: center;
     }
 
     button {
-        font-family: 'MedievalSharp', cursive;
-        background-image: var(--gradient-radial-primary);
-        padding: 0.5rem 1.25rem;
-        font-size: 1.2rem;
-        color: #fff;
-        transition: color 300ms, filter 300ms;
-        cursor: pointer;
-        width: fit-content;
-        pointer-events: all;
+      font-family: 'MedievalSharp', cursive;
+      background-image: var(--gradient-radial-primary);
+      padding: 0.5rem 1.25rem;
+      font-size: 1.2rem;
+      color: #fff;
+      transition: color 300ms, filter 300ms;
+      cursor: pointer;
+      width: fit-content;
+      pointer-events: all;
 
       &:hover {
         filter: brightness(1.25) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));

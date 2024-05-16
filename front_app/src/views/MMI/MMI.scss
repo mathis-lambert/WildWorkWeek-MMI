@@ -1,0 +1,87 @@
+.mmi {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: justify;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  height: calc(100vh - var(--root-padding) * 2 - 100px);
+  padding-top: 100px;
+  padding-inline: 1rem;
+
+  h1, h2 {
+    font-family: 'MedievalSharp', cursive;
+    line-height: 1.1;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+
+    .artefact {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100px;
+        height: auto;
+        object-fit: contain;
+      }
+    }
+
+    .mmi-cards {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: nowrap;
+      justify-content: center;
+
+      .mmi-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        min-width: 250px;
+        padding: 1rem;
+        background-image: var(--gradient-radial-secondary);
+        border: 5px solid #132434;
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        transition: transform 300ms;
+        cursor: pointer;
+        pointer-events: all;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+
+        h3 {
+          font-family: 'MedievalSharp', cursive;
+        }
+      }
+    }
+
+    .btn {
+      border-radius: 8px;
+      font-family: 'MedievalSharp', cursive;
+      background-image: var(--gradient-radial-secondary);
+      padding: 0.5rem 1.25rem;
+      font-size: 1.25rem;
+      color: #fff;
+      transition: transform 300ms, filter 300ms;
+      cursor: pointer;
+      width: fit-content;
+      float: right;
+      margin-bottom: 2rem;
+
+      &:hover {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+      }
+    }
+  }
+}

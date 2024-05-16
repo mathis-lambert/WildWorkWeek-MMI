@@ -1,4 +1,5 @@
 import React from "react";
+import "./Form.scss";
 
 interface FormProps {
     fields:
@@ -22,7 +23,7 @@ interface FormProps {
 
 const Form = ({fields, buttonLabel, onSubmit}: FormProps) => {
     return (
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} className="form">
             {fields.map((field, index) => {
                 if (field.field_type === 'input') {
                     return (
